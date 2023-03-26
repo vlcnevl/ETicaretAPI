@@ -1,5 +1,4 @@
-# OnionArchBase
-Onion Architecture Base Project
+Asp.NET Core API
 
 
 
