@@ -17,17 +17,50 @@ namespace ETicaretAPI.Persistance.Repositories
 
         public DbSet<T> Table => _context.Set<T>();
 
-        public IQueryable<T> GetAll() => Table;
+        public IQueryable<T> GetAll(bool tracking = true)
+        {
+            var query = Table.AsQueryable();
 
-        public async Task<T> GetByIdAsync(string id)
+            if (!tracking) // tracke  edilmesini istemiyorsak 
+                query = query.AsNoTracking();
 
-        => await Table.FirstOrDefaultAsync(data => data.Id == Guid.Parse(id));
+            return query;
 
+        }
 
-        public Task<T> GetSingleAsyc(Expression<Func<T, bool>> method)
-        => Table.FirstOrDefaultAsync(method);
+        public async Task<T> GetByIdAsync(string id, bool tracking = true)
 
-        public IQueryable<T> GetWhere(Expression<Func<T, bool>> method)
-        => Table.Where(method);
+        //=> await Table.FirstOrDefaultAsync(data => data.Id == Guid.Parse(id));
+        //=> await Table.FindByIdAsync(Guid.Parse(id));
+        {
+            var query = Table.AsQueryable();
+            if (!tracking)
+                query = Table.AsNoTracking();
+            return await query.FirstOrDefaultAsync(data => data.Id == Guid.Parse(id));
+
+        }
+
+        public async Task<T> GetSingleAsync(Expression<Func<T, bool>> method, bool tracking = true)
+        {
+           var query = Table.AsQueryable();
+
+            if (!tracking)
+                query = Table.AsNoTracking();
+
+            return await query.FirstOrDefaultAsync(method);
+        }
+            
+            
+
+        public IQueryable<T> GetWhere(Expression<Func<T, bool>> method, bool tracking = true)
+        {
+            var query = Table.Where(method);
+            
+            if(!tracking)
+                query = query.AsNoTracking();
+
+            return query;
+
+        }
     }
 }
