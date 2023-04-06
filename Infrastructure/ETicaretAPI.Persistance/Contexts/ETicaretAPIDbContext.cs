@@ -25,6 +25,8 @@ namespace ETicaretAPI.Persistance.Contexts
                 {
                     EntityState.Added => data.Entity.CreatedDate = DateTime.UtcNow,
                     EntityState.Modified => data.Entity.UpdatedDate = DateTime.UtcNow,
+
+                    _ => DateTime.UtcNow //silinen veri yukarıda eşleşmediği için hata aldık. silinen veri için böylesi iyi
                 };
             }
 
