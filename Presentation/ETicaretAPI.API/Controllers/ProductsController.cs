@@ -20,7 +20,6 @@ namespace ETicaretAPI.API.Controllers
 
         }
 
-
         [HttpGet]
         public async Task<IActionResult> Get()
         {
@@ -34,12 +33,13 @@ namespace ETicaretAPI.API.Controllers
             return Ok(await _productReadRepository.GetByIdAsync(id,false));
         }
 
-
-
-
         [HttpPost]
         public async Task<IActionResult> Post(CreateProductViewModel model)
         {
+            if (ModelState.IsValid)
+            { 
+            
+            }
 
             await _productWriteRepository.AddAsync(new()
             {
@@ -50,7 +50,7 @@ namespace ETicaretAPI.API.Controllers
 
             });
             await _productWriteRepository.SaveAsync();
-            return Ok();
+            return StatusCode((int) HttpStatusCode.Created);
 
         }
 
