@@ -24,6 +24,7 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
+app.UseStaticFiles(); // wwwroot pathine dosya yükleyebilmek için
 app.UseCors();
 
 app.UseHttpsRedirection();
