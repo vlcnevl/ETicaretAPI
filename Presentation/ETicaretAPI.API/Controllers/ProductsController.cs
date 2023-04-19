@@ -1,5 +1,6 @@
 ﻿using ETicaretAPI.Application.Repositories.ProductRepositories;
 using ETicaretAPI.Application.RequestParameters;
+using ETicaretAPI.Application.Services;
 using ETicaretAPI.Application.ViewModels.Products;
 using ETicaretAPI.Domain.Entities;
 using Microsoft.AspNetCore.Mvc;
@@ -13,12 +14,12 @@ namespace ETicaretAPI.API.Controllers
     {
         private readonly IProductWriteRepository _productWriteRepository;
         private readonly IProductReadRepository _productReadRepository;
-        private readonly IWebHostEnvironment _webHostEnvironment;
-        public ProductsController(IProductWriteRepository productWriteRepository, IProductReadRepository productReadRepository, IWebHostEnvironment webHostEnvironment)
+        private readonly IFileService  _fileService;
+        public ProductsController(IProductWriteRepository productWriteRepository, IProductReadRepository productReadRepository, IWebHostEnvironment webHostEnvironment, IFileService fileService)
         {
             _productWriteRepository = productWriteRepository;
             _productReadRepository = productReadRepository;
-            _webHostEnvironment = webHostEnvironment;
+            _fileService = fileService;
         }
 
         [HttpGet]
@@ -99,24 +100,28 @@ namespace ETicaretAPI.API.Controllers
         [HttpPost("[action]")]
         public async Task<IActionResult> Upload()
         {
-            //wwwroot/resource/productImages
-            string uploadPath = Path.Combine(_webHostEnvironment.WebRootPath,"resource/productImages");
+           await _fileService.UploadAsync("productImages",Request.Form.Files);
+            return Ok(); 
 
 
-            if(!Directory.Exists(uploadPath))
-                Directory.CreateDirectory(uploadPath);
+           // //wwwroot/resource/productImages
+           // string uploadPath = Path.Combine(_webHostEnvironment.WebRootPath,"resource/productImages");
+
+
+           // if(!Directory.Exists(uploadPath))
+           //     Directory.CreateDirectory(uploadPath);
             
-            Random rand = new();
-            foreach (IFormFile file in Request.Form.Files)
-            {
-                string fullPath = Path.Combine(uploadPath,$"{rand.Next()}{Path.GetExtension(file.FileName)}");
+           // Random rand = new();
+           // foreach (IFormFile file in Request.Form.Files)
+           // {
+           //     string fullPath = Path.Combine(uploadPath,$"{rand.Next()}{Path.GetExtension(file.FileName)}");
 
-                using FileStream fileStream = new(fullPath, FileMode.Create, FileAccess.Write, FileShare.None,1024*1024,useAsync:false);
+           //     using FileStream fileStream = new(fullPath, FileMode.Create, FileAccess.Write, FileShare.None,1024*1024,useAsync:false);
             
-                await file.CopyToAsync(fileStream);
-                await fileStream.FlushAsync();
-            }
-           return Ok(); 
+           //     await file.CopyToAsync(fileStream);
+           //     await fileStream.FlushAsync();
+           // }
+           
         }
 
     }
