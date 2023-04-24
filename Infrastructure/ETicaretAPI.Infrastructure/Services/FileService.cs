@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
 namespace ETicaretAPI.Infrastructure.Services
@@ -35,24 +36,46 @@ namespace ETicaretAPI.Infrastructure.Services
             }
         }
 
-        public Task<string> FileRenameAsync(string fileName)
+        public async Task<string> FileRenameAsync(string filePath, string fileName)
         {
-            throw new NotImplementedException();
+            string newFileName = Regex.Replace(fileName, @"[\s&()]+", "-"); // Boşluk, ., &, ( ve ) gibi karakterleri '-' işaretine dönüştürür.
+
+            string fullPath = Path.Combine(filePath, newFileName);
+
+            if (!File.Exists(fullPath))
+            {
+                return newFileName;
+            }
+
+            int fileCount = 1;
+            string extension = Path.GetExtension(newFileName);
+            string fileNameWithoutExtension = Path.GetFileNameWithoutExtension(newFileName);
+
+            while (File.Exists(fullPath))
+            {
+                newFileName = fileNameWithoutExtension + "-" + fileCount.ToString() + extension;
+
+                fullPath = Path.Combine(filePath, newFileName);
+                fileCount++;
+            }
+
+            return newFileName;
+
         }
 
         public async Task<List<(string fileName, string path)>> UploadAsync(string path, IFormFileCollection files)
         {
             // weebrootpath wwwroot u getirir direkt
             string uploadPath = Path.Combine(_environment.WebRootPath, path);
-            if (Directory.Exists(uploadPath)) 
+            if (!Directory.Exists(uploadPath)) 
                 Directory.CreateDirectory(uploadPath);
 
             List<bool> results = new();
             List<(string fileName,string path)> datas = new();
 
             foreach (IFormFile file in files) {
-              string fileName = await FileRenameAsync(file.FileName);
-            bool result =  await CopyFileAsync($"{uploadPath}\\{fileName}",file);
+              string fileName = await FileRenameAsync(uploadPath,file.FileName);
+               bool result =  await CopyFileAsync($"{uploadPath}\\{fileName}",file);
                 datas.Add((fileName, $"{uploadPath}\\{fileName}")); 
             }
 
@@ -83,14 +106,7 @@ namespace ETicaretAPI.Infrastructure.Services
             //     await file.CopyToAsync(fileStream);
             //     await fileStream.FlushAsync();
 
-
-
-
-
-
-
-
-
         }
+
     }
 }
