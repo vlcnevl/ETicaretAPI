@@ -1,5 +1,5 @@
 ﻿using ETicaretAPI.Application.Repositories;
-using ETicaretAPI.Domain.Common;
+using ETicaretAPI.Domain.Entities.Common;
 using ETicaretAPI.Persistance.Contexts;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;

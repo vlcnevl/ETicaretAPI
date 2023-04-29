@@ -1,6 +1,7 @@
-﻿using ETicaretAPI.Domain.Common;
-using ETicaretAPI.Domain.Entities;
+﻿using ETicaretAPI.Domain.Entities;
+using ETicaretAPI.Domain.Entities.Common;
 using Microsoft.EntityFrameworkCore;
+using File = ETicaretAPI.Domain.Entities.File;
 
 namespace ETicaretAPI.Persistance.Contexts
 {
@@ -13,7 +14,9 @@ namespace ETicaretAPI.Persistance.Contexts
         public DbSet<Product> Products { get; set; }
         public DbSet<Order> Orders { get; set; }
         public DbSet<Customer> Customers { get; set; }
-
+        public DbSet<File> Files { get; set; }   // bu ve alltaki ikisi tableperhiearchy olayı hepsi tek tabloda birleşti.
+        public DbSet<ProductImageFile> ProductImageFiles { get; set; }
+        public DbSet<InvoiceFile> InvoiceFiles { get; set; }  // 
         public override async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default) // interceptor her savechanges tetiklendiğinde buraya gelecek 
         {
             //update de verinin yakalanmasını sağlar.track yapılan veriyi yakalar.
