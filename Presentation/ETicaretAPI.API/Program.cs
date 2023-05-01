@@ -1,6 +1,7 @@
 using ETicaretAPI.Application.Validators.Products;
 using ETicaretAPI.Infrastructure;
 using ETicaretAPI.Infrastructure.Filters;
+using ETicaretAPI.Infrastructure.Services.Stroage.Azure;
 using ETicaretAPI.Infrastructure.Services.Stroage.Local;
 using ETicaretAPI.Persistance;
 using FluentValidation.AspNetCore;
@@ -9,7 +10,7 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddPersistanceServices();
 builder.Services.AddInfrastructureServices();
-builder.Services.AddStroage<LocalStroage>();
+builder.Services.AddStroage<AzureStroage>();
 
 builder.Services.AddCors(options => options.AddDefaultPolicy(policy=> policy.WithOrigins("http://localhost:4200", "https://localhost:4200").AllowAnyHeader().AllowAnyMethod()));//CORS POLÝTÝKASI
 

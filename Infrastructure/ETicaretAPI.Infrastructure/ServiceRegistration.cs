@@ -3,6 +3,7 @@ using ETicaretAPI.Application.Abstraction.Stroage.LocalStroage;
 using ETicaretAPI.Infrastructure.Enums;
 using ETicaretAPI.Infrastructure.Services;
 using ETicaretAPI.Infrastructure.Services.Stroage;
+using ETicaretAPI.Infrastructure.Services.Stroage.Azure;
 using ETicaretAPI.Infrastructure.Services.Stroage.Local;
 using Microsoft.Extensions.DependencyInjection;
 using System;
@@ -24,12 +25,13 @@ namespace ETicaretAPI.Infrastructure
         {
             services.AddScoped<IStroage, T>();
         }
+        //yukarıdaki daha  tercih edilen bir kod.
         public static void AddStroage<T>(this IServiceCollection services,StroageType stroageType)
         {
             switch(stroageType)
             {
                 case StroageType.Local: services.AddScoped<IStroage, LocalStroage>(); break;
-                case StroageType.Azure: break;
+                case StroageType.Azure: services.AddScoped<IStroage, AzureStroage>(); break;
 
                 default : services.AddScoped<IStroage, LocalStroage>(); break;
             }
