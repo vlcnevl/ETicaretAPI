@@ -14,6 +14,7 @@ namespace ETicaretAPI.Domain.Entities
         public override DateTime UpdatedDate { get => base.UpdatedDate; set => base.UpdatedDate = value; }
         public string FileName { get; set; }
         public string Path { get; set; }
+        public string Stroage { get; set; }
 
     }
 }
