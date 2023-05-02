@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 
 namespace ETicaretAPI.Infrastructure.Services.Stroage.Azure
 {
-    public class AzureStroage : IAzureStroage
+    public class AzureStroage : Stroage, IAzureStroage
     {
         readonly BlobServiceClient _blobServiceClient; // accounta bağlanır
         BlobContainerClient _blobContainerClient; // containera bağlanır
@@ -52,9 +52,11 @@ namespace ETicaretAPI.Infrastructure.Services.Stroage.Azure
 
             foreach (IFormFile file in files) 
             {
-                BlobClient blobClient = _blobContainerClient.GetBlobClient(file.Name);
+              string fileNewName = await FileRenameAsync(containerName, file.Name,HasFile);
+
+                BlobClient blobClient = _blobContainerClient.GetBlobClient(fileNewName);
                await blobClient.UploadAsync(file.OpenReadStream());
-                datas.Add((file.Name,containerName)); 
+                datas.Add((fileNewName,containerName)); 
             }
             return datas;
         }

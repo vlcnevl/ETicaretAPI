@@ -21,7 +21,7 @@ namespace ETicaretAPI.Infrastructure
            services.AddScoped<IStroageService,StroageService>(); 
         }
 
-        public static void AddStroage<T>(this IServiceCollection services) where T : class, IStroage
+        public static void AddStroage<T>(this IServiceCollection services) where T : Stroage, IStroage
         {
             services.AddScoped<IStroage, T>();
         }
