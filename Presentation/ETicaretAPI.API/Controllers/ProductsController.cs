@@ -105,15 +105,31 @@ namespace ETicaretAPI.API.Controllers
         }
 
         [HttpPost("[action]")]
-        public async Task<IActionResult> Upload()
+        public async Task<IActionResult> Upload(string id) // hangi ürüne dosya yüklendiğini id'den ayırt edeceğiz.
         {
-          var datas = await _stroageService.UploadAsync("files",Request.Form.Files);
+          List<(string fileName,string pathOrContainerName)> result = await _stroageService.UploadAsync("product-images",Request.Form.Files);
 
-           await _productImageFileWriteRepository.AddRangeAsync(datas.Select(d => new ProductImageFile()
+          Product product = await _productReadRepository.GetByIdAsync(id);
+
+            //foreach (var file in result)
+            //{
+            //    product.ProductImageFiles.Add(new()
+            //    {
+            //        FileName = file.fileName,
+            //        Path = file.pathOrContainerName,
+            //        Stroage = _stroageService.StroageName,
+            //    });
+            //}
+            
+
+
+            await _productImageFileWriteRepository.AddRangeAsync(result.Select(p => new ProductImageFile()
             {
-                FileName = d.fileName,
-                Path = d.pathOrContainerName,
-                Stroage = _stroageService.StroageName
+                FileName = p.fileName,
+                Path = p.pathOrContainerName,
+                Stroage = _stroageService.StroageName,
+                Products = new List<Product> { product }
+
             }).ToList());
 
             await _productImageFileWriteRepository.SaveAsync();
