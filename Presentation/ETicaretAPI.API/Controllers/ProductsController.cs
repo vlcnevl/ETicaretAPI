@@ -8,6 +8,7 @@ using ETicaretAPI.Domain.Entities;
 using ETicaretAPI.Infrastructure.Services;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using System.Net;
 
 namespace ETicaretAPI.API.Controllers
@@ -20,13 +21,15 @@ namespace ETicaretAPI.API.Controllers
         private readonly IProductReadRepository _productReadRepository;
         private readonly IStroageService _stroageService;
         private readonly IProductImageFileWriteRepository _productImageFileWriteRepository;
+        private readonly IConfiguration _configuration;
 
-        public ProductsController(IProductWriteRepository productWriteRepository, IProductReadRepository productReadRepository, IStroageService stroageService, IProductImageFileWriteRepository productImageFileWriteRepository)
+        public ProductsController(IProductWriteRepository productWriteRepository, IProductReadRepository productReadRepository, IStroageService stroageService, IProductImageFileWriteRepository productImageFileWriteRepository, IConfiguration configuration)
         {
             _productWriteRepository = productWriteRepository;
             _productReadRepository = productReadRepository;
             _stroageService = stroageService;
             _productImageFileWriteRepository = productImageFileWriteRepository;
+            _configuration = configuration;
         }
 
         [HttpGet]
@@ -105,8 +108,8 @@ namespace ETicaretAPI.API.Controllers
         }
 
         [HttpPost("[action]")]
-        public async Task<IActionResult> Upload(string id) // hangi ürüne dosya yüklendiğini id'den ayırt edeceğiz.
-        {
+        public async Task<IActionResult> Upload(string id) // hangi ürüne dosya yüklendiğini id'den ayırt edeceğiz.QueryString'ten geliyo
+        {//gelecek veriler opsiyonel olduğu için query stringde göndrdik.başka verilerde kullanılabilir.
           List<(string fileName,string pathOrContainerName)> result = await _stroageService.UploadAsync("product-images",Request.Form.Files);
 
           Product product = await _productReadRepository.GetByIdAsync(id);
@@ -133,6 +136,31 @@ namespace ETicaretAPI.API.Controllers
             }).ToList());
 
             await _productImageFileWriteRepository.SaveAsync();
+            return Ok();
+        }
+
+        [HttpGet("[action]/{id}")] //route'dan geliyor
+        public async Task<IActionResult> GetProductImages(string id)
+        {
+         Product? product = await _productReadRepository.Table.Include(p=> p.ProductImageFiles).FirstOrDefaultAsync(p => p.Id == Guid.Parse(id));  // imageleri ile productu çektik
+           
+            return Ok(product?.ProductImageFiles.Select(p=> new 
+            {
+             Path = $"{_configuration["BaseStroageUrl"]}/{p.Path}",
+             p.FileName,
+             p.Id
+            }));
+        }
+
+        [HttpDelete("[action]/{productId}/{imageId}")]
+        public async Task<IActionResult> DeleteProductImage(string productId,string imageId)
+        {
+          Product? product =   await _productReadRepository.Table.Include(p=> p.ProductImageFiles).FirstOrDefaultAsync(p=> p.Id == Guid.Parse(productId));
+
+           ProductImageFile productImageFile = product.ProductImageFiles.FirstOrDefault(i => i.Id == Guid.Parse(imageId));
+            
+            product.ProductImageFiles.Remove(productImageFile);
+           await _productWriteRepository.SaveAsync();
             return Ok();
         }
 
