@@ -1,4 +1,6 @@
 ﻿using ETicaretAPI.Application.Abstraction.Stroage;
+using ETicaretAPI.Application.Features.Commands.CreateProduct;
+using ETicaretAPI.Application.Features.Queries.GetAllProduct;
 using ETicaretAPI.Application.Repositories.File;
 using ETicaretAPI.Application.Repositories.ProductIamgeFileRepositories;
 using ETicaretAPI.Application.Repositories.ProductRepositories;
@@ -6,6 +8,7 @@ using ETicaretAPI.Application.RequestParameters;
 using ETicaretAPI.Application.ViewModels.Products;
 using ETicaretAPI.Domain.Entities;
 using ETicaretAPI.Infrastructure.Services;
+using MediatR;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -23,36 +26,23 @@ namespace ETicaretAPI.API.Controllers
         private readonly IProductImageFileWriteRepository _productImageFileWriteRepository;
         private readonly IConfiguration _configuration;
 
-        public ProductsController(IProductWriteRepository productWriteRepository, IProductReadRepository productReadRepository, IStroageService stroageService, IProductImageFileWriteRepository productImageFileWriteRepository, IConfiguration configuration)
+        readonly IMediator _mediator;
+
+        public ProductsController(IProductWriteRepository productWriteRepository, IProductReadRepository productReadRepository, IStroageService stroageService, IProductImageFileWriteRepository productImageFileWriteRepository, IConfiguration configuration, IMediator mediator)
         {
             _productWriteRepository = productWriteRepository;
             _productReadRepository = productReadRepository;
             _stroageService = stroageService;
             _productImageFileWriteRepository = productImageFileWriteRepository;
             _configuration = configuration;
+            _mediator = mediator;
         }
 
         [HttpGet]
-        public async Task<IActionResult> Get([FromQuery] Pagination pagination)
+        public async Task<IActionResult> Get([FromQuery] GetAllProductQueryRequest request)
         {
-            var totalCount = _productReadRepository.GetAll(false).Count();
-
-            var products = _productReadRepository.GetAll(false).Select(p => new  // anonim tip üretip göndermek istediklerimizi gönderdik
-            {
-                p.Id,
-                p.Name,
-                p.Description,
-                p.Price,
-                p.Stock,
-                p.CreatedDate,
-                p.UpdatedDate
-            }).Skip(pagination.Size * pagination.Page).Take(pagination.Size);
-
-            return Ok(new
-            {
-                products,
-                totalCount
-            });
+         GetAllProductQueryResponse response = await _mediator.Send(request);
+            return Ok(response);
         }
 
 
@@ -63,23 +53,10 @@ namespace ETicaretAPI.API.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Post(CreateProductViewModel model)
+        public async Task<IActionResult> Post(CreateProductCommandRequest request)
         {
-            if (ModelState.IsValid)
-            {
-
-            }
-
-            await _productWriteRepository.AddAsync(new()
-            {
-                Name = model.Name,
-                Price = model.Price,
-                Stock = model.Stock,
-                Description = model.Description
-
-            });
-            await _productWriteRepository.SaveAsync();
-            return StatusCode((int)HttpStatusCode.Created);
+           await _mediator.Send(request);
+           return StatusCode((int)HttpStatusCode.Created);
 
         }
 
@@ -152,10 +129,10 @@ namespace ETicaretAPI.API.Controllers
             }));
         }
 
-        [HttpDelete("[action]/{productId}/{imageId}")]
-        public async Task<IActionResult> DeleteProductImage(string productId,string imageId)
+        [HttpDelete("[action]/{id}")]
+        public async Task<IActionResult> DeleteProductImage(string id,string imageId)
         {
-          Product? product =   await _productReadRepository.Table.Include(p=> p.ProductImageFiles).FirstOrDefaultAsync(p=> p.Id == Guid.Parse(productId));
+          Product? product =   await _productReadRepository.Table.Include(p=> p.ProductImageFiles).FirstOrDefaultAsync(p=> p.Id == Guid.Parse(id));
 
            ProductImageFile productImageFile = product.ProductImageFiles.FirstOrDefault(i => i.Id == Guid.Parse(imageId));
             
