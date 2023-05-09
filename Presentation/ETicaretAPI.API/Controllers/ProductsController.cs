@@ -21,21 +21,10 @@ namespace ETicaretAPI.API.Controllers
     [ApiController]
     public class ProductsController : ControllerBase
     {
-        private readonly IProductWriteRepository _productWriteRepository;
-        private readonly IProductReadRepository _productReadRepository;
-        private readonly IStroageService _stroageService;
-        private readonly IProductImageFileWriteRepository _productImageFileWriteRepository;
-        private readonly IConfiguration _configuration;
-
         readonly IMediator _mediator;
 
         public ProductsController(IProductWriteRepository productWriteRepository, IProductReadRepository productReadRepository, IStroageService stroageService, IProductImageFileWriteRepository productImageFileWriteRepository, IConfiguration configuration, IMediator mediator)
         {
-            _productWriteRepository = productWriteRepository;
-            _productReadRepository = productReadRepository;
-            _stroageService = stroageService;
-            _productImageFileWriteRepository = productImageFileWriteRepository;
-            _configuration = configuration;
             _mediator = mediator;
         }
 
