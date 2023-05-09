@@ -1,6 +1,6 @@
 ﻿using ETicaretAPI.Application.Abstraction.Stroage;
-using ETicaretAPI.Application.Features.Commands.CreateProduct;
-using ETicaretAPI.Application.Features.Queries.GetAllProduct;
+using ETicaretAPI.Application.Features.Commands.Product.CreateProduct;
+using ETicaretAPI.Application.Features.Queries.Product.GetAllProduct;
 using ETicaretAPI.Application.Repositories.File;
 using ETicaretAPI.Application.Repositories.ProductIamgeFileRepositories;
 using ETicaretAPI.Application.Repositories.ProductRepositories;

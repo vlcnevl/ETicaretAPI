@@ -7,7 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ETicaretAPI.Application.Features.Queries.GetAllProduct
+namespace ETicaretAPI.Application.Features.Queries.Product.GetAllProduct
 {
     public class GetAllProductQueryHandler : IRequestHandler<GetAllProductQueryRequest, GetAllProductQueryResponse>
     {
@@ -32,7 +32,7 @@ namespace ETicaretAPI.Application.Features.Queries.GetAllProduct
                 p.UpdatedDate
             }).Skip(request.Size * request.Page).Take(request.Size).ToList();
 
-            return new() { Products = products, TotalCount = totalCount};
+            return new() { Products = products, TotalCount = totalCount };
 
         }
     }
