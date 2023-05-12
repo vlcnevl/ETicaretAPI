@@ -13,6 +13,7 @@ using ETicaretAPI.Application.Repositories.ProductIamgeFileRepositories;
 using ETicaretAPI.Persistance.Repositories.ProductImageFileRepositories;
 using ETicaretAPI.Application.Repositories.InvoiceFileRepositories;
 using ETicaretAPI.Persistance.Repositories.InvoiceFileRepositories;
+using ETicaretAPI.Domain.Entities.Identity;
 
 namespace ETicaretAPI.Persistance
 {
@@ -23,6 +24,15 @@ namespace ETicaretAPI.Persistance
 
             //autofac ile güncellenebilir.
             services.AddDbContext<ETicaretAPIDbContext>(options => options.UseNpgsql(Configuration.ConnectionString));
+            services.AddIdentity<AppUser, AppRole>(options=> { 
+                options.Password.RequiredLength = 3; // şifre sınrlamalarını kaldırdım.
+                options.Password.RequireNonAlphanumeric = false;
+                options.Password.RequireDigit = false;
+                options.Password.RequireLowercase = false;
+                options.Password.RequireUppercase = false;
+                })
+                .AddEntityFrameworkStores<ETicaretAPIDbContext>();//identity mekanizması
+            
             services.AddScoped<ICustomerReadRepository,CustomerReadRepository>();
             services.AddScoped<ICustomerWriteRepository,CustomerWriteRepository>();
             services.AddScoped<IProductReadRepository,ProductReadRepository>();
