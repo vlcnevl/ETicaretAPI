@@ -5,6 +5,7 @@ using ETicaretAPI.Infrastructure.Filters;
 using ETicaretAPI.Infrastructure.Services.Stroage.Azure;
 using ETicaretAPI.Persistance;
 using FluentValidation.AspNetCore;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 
@@ -23,7 +24,7 @@ builder.Services.AddControllers(options=> options.Filters.Add<ValidationFilter>(
 //ikinci options asp.net le gelen base validasyon filtrelerini kaldýrarak bizim validasyonlarý yazacak
 
 
-builder.Services.AddAuthentication("Admin").AddJwtBearer(options =>
+builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer("Admin",options =>
 {
     options.TokenValidationParameters = new() // hangi deðerlere göre token doðrulanacak
     {
@@ -56,6 +57,7 @@ app.UseCors();
 
 app.UseHttpsRedirection();
 
+app.UseAuthentication(); // authenticationu yukarda ekledik burda da kontrol ettiriiyoruz
 app.UseAuthorization();
 
 app.MapControllers();
