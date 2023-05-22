@@ -1,10 +1,8 @@
-﻿using ETicaretAPI.Application.Abstraction.GoogleLogin;
-using ETicaretAPI.Application.Abstraction.Stroage;
+﻿using ETicaretAPI.Application.Abstraction.Stroage;
 using ETicaretAPI.Application.Abstraction.Stroage.LocalStroage;
 using ETicaretAPI.Application.Abstraction.Token;
 using ETicaretAPI.Infrastructure.Enums;
 using ETicaretAPI.Infrastructure.Services;
-using ETicaretAPI.Infrastructure.Services.GoogleLogin;
 using ETicaretAPI.Infrastructure.Services.Stroage;
 using ETicaretAPI.Infrastructure.Services.Stroage.Azure;
 using ETicaretAPI.Infrastructure.Services.Stroage.Local;
@@ -24,7 +22,6 @@ namespace ETicaretAPI.Infrastructure
         {
            services.AddScoped<IStroageService,StroageService>();
            services.AddScoped<ITokenHandler, TokenHandler>();
-           services.AddScoped<IGoogleLogin, GoogleLogin>();
         }
 
         public static void AddStroage<T>(this IServiceCollection services) where T : Stroage, IStroage

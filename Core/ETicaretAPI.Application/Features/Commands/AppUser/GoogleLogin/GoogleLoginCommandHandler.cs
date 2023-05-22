@@ -1,14 +1,6 @@
-﻿using ETicaretAPI.Application.Abstraction.GoogleLogin;
-using ETicaretAPI.Application.Abstraction.Token;
-using ETicaretAPI.Application.DTOs;
-using ETicaretAPI.Domain.Entities.Identity;
+﻿using ETicaretAPI.Application.Abstraction.Services;
 using MediatR;
-using Microsoft.AspNetCore.Identity;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+
 
 namespace ETicaretAPI.Application.Features.Commands.AppUser.GoogleLogin
 {
@@ -16,11 +8,10 @@ namespace ETicaretAPI.Application.Features.Commands.AppUser.GoogleLogin
     { // todo bu işlemi infranstucture da yapıp bir interface ile burda kullanmak daha doğru
 
       
-        readonly IGoogleLogin _googleLogin;
-        public GoogleLoginCommandHandler(UserManager<Domain.Entities.Identity.AppUser> userManager, ITokenHandler tokenHandler, IGoogleLogin googleLogin)
+        readonly IAuthService _authService;
+        public GoogleLoginCommandHandler(IAuthService authService)
         {
-
-            _googleLogin = googleLogin;
+            _authService = authService;
         }
 
         public async Task<GoogleLoginCommandResponse> Handle(GoogleLoginCommandRequest request, CancellationToken cancellationToken)
@@ -64,7 +55,7 @@ namespace ETicaretAPI.Application.Features.Commands.AppUser.GoogleLogin
 
             //Token token =  _tokenHandler.CreateAccessToken(5);
 
-            Token token = await _googleLogin.Login(request);
+            var token = await _authService.GoogleLoginAsync(request.IdToken, 30);
             return new()
             {
                 Token = token
