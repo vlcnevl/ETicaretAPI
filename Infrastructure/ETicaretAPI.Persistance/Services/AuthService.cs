@@ -24,12 +24,14 @@ namespace ETicaretAPI.Persistance.Services
         readonly ITokenHandler _tokenHandler;
         readonly SignInManager<Domain.Entities.Identity.AppUser> _signInManager;
         readonly IConfiguration _configuration;
-        public AuthService(UserManager<AppUser> userManager, ITokenHandler tokenHandler, SignInManager<AppUser> signInManager, IConfiguration configuration)
+        readonly IUserService _userService;
+        public AuthService(UserManager<AppUser> userManager, ITokenHandler tokenHandler, SignInManager<AppUser> signInManager, IConfiguration configuration, IUserService userService)
         {
             _userManager = userManager;
             _tokenHandler = tokenHandler;
             _signInManager = signInManager;
             _configuration = configuration;
+            _userService = userService;
         }
 
         public async Task<Token> GoogleLoginAsync(string idToken,int accessTokenLifeTime)
@@ -66,14 +68,15 @@ namespace ETicaretAPI.Persistance.Services
             }
 
             if (result)
+            {
                 await _userManager.AddLoginAsync(user, info);// Asp.NetUserLogins tablosuna eklendi.
+                Application.DTOs.Token token = _tokenHandler.CreateAccessToken(accessTokenLifeTime);
+                await _userService.UpdateRefreshToken(token.RefreshToken, user, token.Expiration,5);
 
-            else
-                throw new Exception("Google ile giriş işlemi başarısız.");
-
-
-            Application.DTOs.Token token = _tokenHandler.CreateAccessToken(accessTokenLifeTime);
-            return token;
+                return token;
+            }
+            else    
+            throw new Exception("Google ile giriş işlemi başarısız.");
         }
 
         public async Task<Token> LoginAsync(LoginUser model, int accessTokenLifeTime)
@@ -90,6 +93,8 @@ namespace ETicaretAPI.Persistance.Services
             if (result.Succeeded) //authantication basarili
             {
                 Token token = _tokenHandler.CreateAccessToken(accessTokenLifeTime);
+                await _userService.UpdateRefreshToken(token.RefreshToken, user, token.Expiration, 5);
+
                 return token; 
             }
 
