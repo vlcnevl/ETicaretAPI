@@ -10,5 +10,7 @@ namespace ETicaretAPI.Application.Abstraction.Services.Authentications
     public interface IInternalAuthentication // solid için ayırdık .
     {
         Task<DTOs.Token> LoginAsync(LoginUser model, int accessTokenLifeTime); // internal login 
+        Task<DTOs.Token> RefreshTokenLoginAsync(string refreshToken);
+
     }
 }

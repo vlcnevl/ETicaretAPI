@@ -8,6 +8,7 @@ using ETicaretAPI.Domain.Entities.Identity;
 using Google.Apis.Auth;
 using MediatR;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using System;
 using System.Collections.Generic;
@@ -71,7 +72,7 @@ namespace ETicaretAPI.Persistance.Services
             {
                 await _userManager.AddLoginAsync(user, info);// Asp.NetUserLogins tablosuna eklendi.
                 Application.DTOs.Token token = _tokenHandler.CreateAccessToken(accessTokenLifeTime);
-                await _userService.UpdateRefreshToken(token.RefreshToken, user, token.Expiration,5);
+                await _userService.UpdateRefreshToken(token.RefreshToken, user, token.Expiration,15);
 
                 return token;
             }
@@ -93,13 +94,27 @@ namespace ETicaretAPI.Persistance.Services
             if (result.Succeeded) //authantication basarili
             {
                 Token token = _tokenHandler.CreateAccessToken(accessTokenLifeTime);
-                await _userService.UpdateRefreshToken(token.RefreshToken, user, token.Expiration, 5);
+                await _userService.UpdateRefreshToken(token.RefreshToken, user, token.Expiration, 15);
 
                 return token; 
             }
 
             //  return new LoginUserErrorCommandResponse() { Message = "Kimlik doğrulama hatası"};
             throw new AuthenticationErrorException();
+        }
+
+        public async Task<Token> RefreshTokenLoginAsync(string refreshToken)
+        {
+           AppUser? user = await _userManager.Users.FirstOrDefaultAsync(u=> u.RefreshToken ==  refreshToken);
+            //gelen refresh tokeni içeren satır varsa getirdi.
+            if (user != null && user?.RefreshTokenEndTime > DateTime.UtcNow)
+            {
+                Token token = _tokenHandler.CreateAccessToken(15);
+                await _userService.UpdateRefreshToken(token.RefreshToken, user, token.Expiration, 30);
+                return token;
+            }
+            else
+                throw new UserNotFoundException();
         }
     }
 }
