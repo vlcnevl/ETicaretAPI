@@ -121,7 +121,6 @@ app.Use(async (context,next) => //burda yazýlmasý pek dogru degil.
 });//middleware authenticate olmus userin ismini getirecek ve loglama yapacaðýz.
 
 
-
 app.MapControllers();
 
 app.Run();
