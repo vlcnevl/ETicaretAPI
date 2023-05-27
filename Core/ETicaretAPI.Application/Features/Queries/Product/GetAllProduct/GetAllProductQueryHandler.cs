@@ -34,7 +34,9 @@ namespace ETicaretAPI.Application.Features.Queries.Product.GetAllProduct
                 p.CreatedDate,
                 p.UpdatedDate
             }).Skip(request.Size * request.Page).Take(request.Size).ToList();
+
             _logger.LogInformation("ürünler listelendi");
+
             return new() { Products = products, TotalCount = totalCount };
 
         }

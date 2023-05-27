@@ -1,4 +1,5 @@
 using ETicaretAPI.API.Configurations.ColumnWriters;
+using ETicaretAPI.API.Extenions;
 using ETicaretAPI.Application;
 using ETicaretAPI.Application.Validators.Products;
 using ETicaretAPI.Infrastructure;
@@ -89,13 +90,15 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 
-var app = builder.Build();
+var app = builder.Build(); //middlewaresler
 
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
 }
+
+app.ConfigureExceptionHandler<Program>(app.Services.GetRequiredService<ILogger<Program>>());// middleware a göndermek için bir logger nesnesini gönderdik
 
 app.UseStaticFiles(); // wwwroot pathine dosya yükleyebilmek için
 app.UseSerilogRequestLogging();// bu middlewareden sonra ne varsa loglansýn
@@ -109,7 +112,7 @@ app.UseAuthentication(); // authenticationu yukarda ekledik burda da kontrol ett
 app.UseAuthorization();
 
 
-app.Use(async (context,next) =>
+app.Use(async (context,next) => //burda yazýlmasý pek dogru degil.
 {
     var username = context.User?.Identity?.IsAuthenticated != null || true ? context.User.Identity.Name : null; // gelen istekteki jwt ye bakar. içerisinde username varsa getirir.
     LogContext.PushProperty("user_name", username);
