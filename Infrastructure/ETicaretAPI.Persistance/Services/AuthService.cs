@@ -71,7 +71,7 @@ namespace ETicaretAPI.Persistance.Services
             if (result)
             {
                 await _userManager.AddLoginAsync(user, info);// Asp.NetUserLogins tablosuna eklendi.
-                Application.DTOs.Token token = _tokenHandler.CreateAccessToken(accessTokenLifeTime);
+                Application.DTOs.Token token = _tokenHandler.CreateAccessToken(accessTokenLifeTime,user);
                 await _userService.UpdateRefreshToken(token.RefreshToken, user, token.Expiration,15);
 
                 return token;
@@ -93,7 +93,7 @@ namespace ETicaretAPI.Persistance.Services
             SignInResult result = await _signInManager.CheckPasswordSignInAsync(user, model.Password, false); //kullanıcı ile şifreyi karşılaştırmak için. 3 kere yanlış şifre girilince beş dk beklenmesin
             if (result.Succeeded) //authantication basarili
             {
-                Token token = _tokenHandler.CreateAccessToken(accessTokenLifeTime);
+                Token token = _tokenHandler.CreateAccessToken(accessTokenLifeTime, user);
                 await _userService.UpdateRefreshToken(token.RefreshToken, user, token.Expiration, 15);
 
                 return token; 
@@ -109,7 +109,7 @@ namespace ETicaretAPI.Persistance.Services
             //gelen refresh tokeni içeren satır varsa getirdi.
             if (user != null && user?.RefreshTokenEndTime > DateTime.UtcNow)
             {
-                Token token = _tokenHandler.CreateAccessToken(15);
+                Token token = _tokenHandler.CreateAccessToken(15,user);
                 await _userService.UpdateRefreshToken(token.RefreshToken, user, token.Expiration, 30);
                 return token;
             }

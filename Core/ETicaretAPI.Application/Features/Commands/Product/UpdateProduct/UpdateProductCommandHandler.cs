@@ -1,5 +1,6 @@
 ﻿using ETicaretAPI.Application.Repositories.ProductRepositories;
 using MediatR;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -14,7 +15,7 @@ namespace ETicaretAPI.Application.Features.Commands.Product.UpdateProduct
         readonly IProductReadRepository _productReadRepository;
         readonly IProductWriteRepository _productWriteRepository;
 
-        public UpdateProductCommandHandler(IProductReadRepository productReadRepository, IProductWriteRepository productWriteRepository = null)
+        public UpdateProductCommandHandler(IProductReadRepository productReadRepository, IProductWriteRepository productWriteRepository = null, ILogger<UpdateProductCommandHandler> logger = null)
         {
             _productReadRepository = productReadRepository;
             _productWriteRepository = productWriteRepository;
@@ -30,7 +31,6 @@ namespace ETicaretAPI.Application.Features.Commands.Product.UpdateProduct
             product.Description = request.Description;
             
             await _productWriteRepository.SaveAsync();
-
             return new();
         }
     }

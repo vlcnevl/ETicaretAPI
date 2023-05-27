@@ -1,3 +1,4 @@
+using ETicaretAPI.API.Configurations.ColumnWriters;
 using ETicaretAPI.Application;
 using ETicaretAPI.Application.Validators.Products;
 using ETicaretAPI.Infrastructure;
@@ -6,7 +7,14 @@ using ETicaretAPI.Infrastructure.Services.Stroage.Azure;
 using ETicaretAPI.Persistance;
 using FluentValidation.AspNetCore;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.DataProtection;
+using Microsoft.AspNetCore.HttpLogging;
 using Microsoft.IdentityModel.Tokens;
+using Serilog;
+using Serilog.Context;
+using Serilog.Core;
+using Serilog.Sinks.PostgreSQL;
+using System.Security.Claims;
 using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -36,14 +44,50 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJw
         ValidAudience = builder.Configuration["Token:Audience"],
         ValidIssuer = builder.Configuration["Token:Issuer"],
         IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["Token:SecurityKey"])),
-        LifetimeValidator = (notBefore, expires, securityToken, validationParameters) => expires!=null ? expires > DateTime.UtcNow : false //tokeni expire edecek.
+        LifetimeValidator = (notBefore, expires, securityToken, validationParameters) => expires != null ? expires > DateTime.UtcNow : false, //tokeni expire edecek.
      
+        NameClaimType = ClaimTypes.Name, //hangi kullanýcýnýn istek yaptýðýný gösterir . logda usernamei kullanabilmek için User.Identity.Name den kullanabiliriz.
+
     };
     
 });
- 
+
+Logger log = new LoggerConfiguration()
+    .WriteTo.Console()
+    .WriteTo.File("logs/log.txt")
+    .WriteTo.Seq(builder.Configuration["Seq:ServerUrl"])
+    .WriteTo.PostgreSQL(builder.Configuration.GetConnectionString("PostgreSql"), "logs", needAutoCreateTable: true,
+    columnOptions: new Dictionary<string, ColumnWriterBase> //veritabanýndaki log tablosu düzenlendi.
+    {
+        {"message",new RenderedMessageColumnWriter()},
+        {"message_template",new MessageTemplateColumnWriter()},
+        {"level",new LevelColumnWriter()},
+        {"time_stamp",new TimestampColumnWriter()},
+        {"exception",new ExceptionColumnWriter()},
+        {"log_event",new LogEventSerializedColumnWriter()},
+        {"user_name", new UsernameColumnWriter()}
+
+    })
+    .Enrich.FromLogContext()//logcontexte asagida koydugumuz propertiyi burda kullanacaðýz dedik.
+    .MinimumLevel.Information()
+    .CreateLogger();
+    
+builder.Host.UseSerilog(log);
+builder.Services.AddHttpLogging(logging =>
+{
+    logging.LoggingFields = HttpLoggingFields.All;
+    logging.RequestHeaders.Add("sec-ch-ua"); //kullanýcýnýn bütün bilgilerini getiir.
+    logging.MediaTypeOptions.AddText("application/javascript");
+    logging.RequestBodyLogLimit = 4096;
+    logging.ResponseBodyLogLimit = 4096;
+
+});
+
+
+
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+
 
 var app = builder.Build();
 
@@ -54,12 +98,26 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseStaticFiles(); // wwwroot pathine dosya yükleyebilmek için
+app.UseSerilogRequestLogging();// bu middlewareden sonra ne varsa loglansýn
+app.UseHttpLogging();
+
 app.UseCors();
 
 app.UseHttpsRedirection();
 
 app.UseAuthentication(); // authenticationu yukarda ekledik burda da kontrol ettiriiyoruz
 app.UseAuthorization();
+
+
+app.Use(async (context,next) =>
+{
+    var username = context.User?.Identity?.IsAuthenticated != null || true ? context.User.Identity.Name : null; // gelen istekteki jwt ye bakar. içerisinde username varsa getirir.
+    LogContext.PushProperty("user_name", username);
+
+    await next();
+});//middleware authenticate olmus userin ismini getirecek ve loglama yapacaðýz.
+
+
 
 app.MapControllers();
 
