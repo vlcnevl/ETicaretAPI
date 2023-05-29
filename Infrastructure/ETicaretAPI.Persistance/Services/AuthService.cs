@@ -72,7 +72,7 @@ namespace ETicaretAPI.Persistance.Services
             {
                 await _userManager.AddLoginAsync(user, info);// Asp.NetUserLogins tablosuna eklendi.
                 Application.DTOs.Token token = _tokenHandler.CreateAccessToken(accessTokenLifeTime,user);
-                await _userService.UpdateRefreshToken(token.RefreshToken, user, token.Expiration,15);
+                await _userService.UpdateRefreshToken(token.RefreshToken, user, token.Expiration,600);
 
                 return token;
             }
@@ -94,7 +94,7 @@ namespace ETicaretAPI.Persistance.Services
             if (result.Succeeded) //authantication basarili
             {
                 Token token = _tokenHandler.CreateAccessToken(accessTokenLifeTime, user);
-                await _userService.UpdateRefreshToken(token.RefreshToken, user, token.Expiration, 15);
+                await _userService.UpdateRefreshToken(token.RefreshToken, user, token.Expiration, 2400);//refresh tokeni olustur ve veritabanına kaydet.
 
                 return token; 
             }
@@ -110,7 +110,7 @@ namespace ETicaretAPI.Persistance.Services
             if (user != null && user?.RefreshTokenEndTime > DateTime.UtcNow)
             {
                 Token token = _tokenHandler.CreateAccessToken(15,user);
-                await _userService.UpdateRefreshToken(token.RefreshToken, user, token.Expiration, 30);
+                await _userService.UpdateRefreshToken(token.RefreshToken, user, token.Expiration, 2400);
                 return token;
             }
             else

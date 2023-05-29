@@ -6,9 +6,9 @@ using ETicaretAPI.Infrastructure;
 using ETicaretAPI.Infrastructure.Filters;
 using ETicaretAPI.Infrastructure.Services.Stroage.Azure;
 using ETicaretAPI.Persistance;
+using ETicaretAPI.SignalR;
 using FluentValidation.AspNetCore;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.HttpLogging;
 using Microsoft.IdentityModel.Tokens;
 using Serilog;
@@ -23,9 +23,10 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddPersistanceServices();
 builder.Services.AddInfrastructureServices();
 builder.Services.AddApplicationServices();
+builder.Services.AddSignalRServices();
 builder.Services.AddStroage<AzureStroage>();
 
-builder.Services.AddCors(options => options.AddDefaultPolicy(policy=> policy.WithOrigins("http://localhost:4200", "https://localhost:4200").AllowAnyHeader().AllowAnyMethod()));//CORS POLÝTÝKASI
+builder.Services.AddCors(options => options.AddDefaultPolicy(policy=> policy.WithOrigins("http://localhost:4200", "https://localhost:4200").AllowAnyHeader().AllowAnyMethod().AllowCredentials() ));//CORS POLÝTÝKASI
 
 builder.Services.AddControllers(options=> options.Filters.Add<ValidationFilter>()).AddFluentValidation(configuration => configuration.RegisterValidatorsFromAssemblyContaining<CreateProductValidator>())
         .ConfigureApiBehaviorOptions(options=> options.SuppressModelStateInvalidFilter = true);
@@ -121,6 +122,8 @@ app.Use(async (context,next) => //burda yazýlmasý pek dogru degil.
 });//middleware authenticate olmus userin ismini getirecek ve loglama yapacaðýz.
 
 
+
 app.MapControllers();
+app.MapHubs(); // signalR classlibden gelen extension fonksiyon.
 
 app.Run();
