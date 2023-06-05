@@ -1,5 +1,6 @@
 ﻿using ETicaretAPI.Application.Repositories.ProductRepositories;
 using MediatR;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
@@ -24,7 +25,7 @@ namespace ETicaretAPI.Application.Features.Queries.Product.GetAllProduct
         {
             var totalCount = _productReadRepository.GetAll(false).Count();
 
-            var products = _productReadRepository.GetAll(false).Select(p => new  // anonim tip üretip göndermek istediklerimizi gönderdik
+            var products = _productReadRepository.GetAll(false).Include(p => p.ProductImageFiles).Select(p => new  // anonim tip üretip göndermek istediklerimizi gönderdik
             {
                 p.Id,
                 p.Name,
@@ -32,7 +33,8 @@ namespace ETicaretAPI.Application.Features.Queries.Product.GetAllProduct
                 p.Price,
                 p.Stock,
                 p.CreatedDate,
-                p.UpdatedDate
+                p.UpdatedDate,
+                p.ProductImageFiles
             }).Skip(request.Size * request.Page).Take(request.Size).ToList();
 
             _logger.LogInformation("ürünler listelendi");
