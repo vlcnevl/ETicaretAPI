@@ -19,6 +19,21 @@ namespace ETicaretAPI.Persistance.Contexts
         public DbSet<File> Files { get; set; }   // bu ve alltaki ikisi tableperhiearchy olayı hepsi tek tabloda birleşti.
         public DbSet<ProductImageFile> ProductImageFiles { get; set; }
         public DbSet<InvoiceFile> InvoiceFiles { get; set; }  // 
+        public DbSet<Basket> Baskets { get; set; }  
+        public DbSet<BasketItem> BasketItems { get; set; }
+
+
+        protected override void OnModelCreating(ModelBuilder builder) // order ve basket arasında 1-1 iliski oldugu için bunu bildirmemiz gerekli.
+        {
+            builder.Entity<Basket>().HasKey(b => b.Id); // basketteki idyi primary key olarak ayarladık.
+
+            builder.Entity<Basket>().HasOne(b => b.Order).WithOne(o => o.Basket).HasForeignKey<Basket>(b => b.OrderId);
+
+            base.OnModelCreating(builder); //identityDbContext kullandığımız için override edemedik.basedekini çağırdık. 
+        }
+
+
+
         public override async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default) // interceptor her savechanges tetiklendiğinde buraya gelecek 
         {
             //update de verinin yakalanmasını sağlar.track yapılan veriyi yakalar.

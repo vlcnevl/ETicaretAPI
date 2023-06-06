@@ -3,6 +3,7 @@ using System;
 using ETicaretAPI.Persistance.Contexts;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace ETicaretAPI.Persistance.Migrations
 {
     [DbContext(typeof(ETicaretAPIDbContext))]
-    partial class ETicaretAPIDbContextModelSnapshot : ModelSnapshot
+    [Migration("20230606120037_mig_11")]
+    partial class mig_11
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -31,9 +34,6 @@ namespace ETicaretAPI.Persistance.Migrations
                     b.Property<DateTime>("CreatedDate")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<Guid>("OrderId")
-                        .HasColumnType("uuid");
-
                     b.Property<DateTime>("UpdatedDate")
                         .HasColumnType("timestamp with time zone");
 
@@ -42,9 +42,6 @@ namespace ETicaretAPI.Persistance.Migrations
                         .HasColumnType("text");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("OrderId")
-                        .IsUnique();
 
                     b.HasIndex("UserId");
 
@@ -245,9 +242,6 @@ namespace ETicaretAPI.Persistance.Migrations
                     b.Property<string>("Address")
                         .IsRequired()
                         .HasColumnType("text");
-
-                    b.Property<Guid>("BasketId")
-                        .HasColumnType("uuid");
 
                     b.Property<DateTime>("CreatedDate")
                         .HasColumnType("timestamp with time zone");
@@ -455,19 +449,11 @@ namespace ETicaretAPI.Persistance.Migrations
 
             modelBuilder.Entity("ETicaretAPI.Domain.Entities.Basket", b =>
                 {
-                    b.HasOne("ETicaretAPI.Domain.Entities.Order", "Order")
-                        .WithOne("Basket")
-                        .HasForeignKey("ETicaretAPI.Domain.Entities.Basket", "OrderId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
                     b.HasOne("ETicaretAPI.Domain.Entities.Identity.AppUser", "User")
                         .WithMany("Baskets")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-
-                    b.Navigation("Order");
 
                     b.Navigation("User");
                 });
@@ -596,12 +582,6 @@ namespace ETicaretAPI.Persistance.Migrations
             modelBuilder.Entity("ETicaretAPI.Domain.Entities.Identity.AppUser", b =>
                 {
                     b.Navigation("Baskets");
-                });
-
-            modelBuilder.Entity("ETicaretAPI.Domain.Entities.Order", b =>
-                {
-                    b.Navigation("Basket")
-                        .IsRequired();
                 });
 
             modelBuilder.Entity("ETicaretAPI.Domain.Entities.Product", b =>
