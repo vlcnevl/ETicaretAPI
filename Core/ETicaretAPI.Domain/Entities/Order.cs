@@ -12,7 +12,6 @@ namespace ETicaretAPI.Domain.Entities
         public Guid CustomerId { get; set; }
         public string Description { get; set; }
         public string Address { get; set; }
-        public Guid BasketId { get; set; } // siparişlerle sepet arasında 1-1 iliski kurduk
         public Basket Basket { get; set; }
         public ICollection<Product> Products { get; set; }
         public Customer Customer { get; set; }

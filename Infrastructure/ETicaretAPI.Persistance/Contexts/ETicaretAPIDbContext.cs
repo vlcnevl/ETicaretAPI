@@ -25,10 +25,10 @@ namespace ETicaretAPI.Persistance.Contexts
 
         protected override void OnModelCreating(ModelBuilder builder) // order ve basket arasında 1-1 iliski oldugu için bunu bildirmemiz gerekli.
         {
-            builder.Entity<Basket>().HasKey(b => b.Id); // basketteki idyi primary key olarak ayarladık.
+            builder.Entity<Order>().HasKey(o => o.Id); // orderdaki idyi primary key olarak ayarladık.
 
-            builder.Entity<Basket>().HasOne(b => b.Order).WithOne(o => o.Basket).HasForeignKey<Basket>(b => b.OrderId);
-
+            builder.Entity<Basket>().HasOne(b => b.Order).WithOne(o => o.Basket).HasForeignKey<Order>(o => o.Id);
+            //orderin içindeki id foreign key
             base.OnModelCreating(builder); //identityDbContext kullandığımız için override edemedik.basedekini çağırdık. 
         }
 

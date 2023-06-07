@@ -12,7 +12,6 @@ namespace ETicaretAPI.Domain.Entities
     {
         public string UserId { get; set; } //foreignkey
         public AppUser User { get; set; }
-        public Guid OrderId { get; set; }
         public Order Order { get; set; }
         public ICollection<BasketItem> BasketItems { get; set; }
     }

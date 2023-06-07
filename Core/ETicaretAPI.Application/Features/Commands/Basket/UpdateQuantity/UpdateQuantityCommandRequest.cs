@@ -1,12 +1,13 @@
-﻿using System;
+﻿using MediatR;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ETicaretAPI.Application.ViewModels.Basket
+namespace ETicaretAPI.Application.Features.Commands.Basket.UpdateQuantity
 {
-    public class UpdateBasketItemViewModel
+    public class UpdateQuantityCommandRequest : IRequest<UpdateQuantityCommandResponse>
     {
         public string BasketItemId { get; set; }
         public int Quantity { get; set; }
