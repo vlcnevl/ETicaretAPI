@@ -7,7 +7,7 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace ETicaretAPI.Application.Features.Commands.Product.RemoveProduct
-{
+{ //product service yazıp repositoryleri orda kullan.
     public class RemoveProductCommandHandler : IRequestHandler<RemoveProductCommandRequest, RemoveProductCommandResponse>
     {
         readonly IProductWriteRepository _productWriteRepository;
