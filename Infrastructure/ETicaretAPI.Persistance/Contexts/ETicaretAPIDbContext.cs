@@ -27,6 +27,8 @@ namespace ETicaretAPI.Persistance.Contexts
         {
             builder.Entity<Order>().HasKey(o => o.Id); // orderdaki idyi primary key olarak ayarladık.
 
+            builder.Entity<Order>().HasIndex(o => o.OrderCode).IsUnique(); // ordercode benzersiz bir değer olsun.
+
             builder.Entity<Basket>().HasOne(b => b.Order).WithOne(o => o.Basket).HasForeignKey<Order>(o => o.Id);
             //orderin içindeki id foreign key
             base.OnModelCreating(builder); //identityDbContext kullandığımız için override edemedik.basedekini çağırdık. 

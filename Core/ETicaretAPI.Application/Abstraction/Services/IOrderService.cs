@@ -1,4 +1,5 @@
 ﻿using ETicaretAPI.Application.DTOs.Order;
+using ETicaretAPI.Domain.Entities;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,6 +10,8 @@ namespace ETicaretAPI.Application.Abstraction.Services
 {
     public interface IOrderService
     {
-        Task CreateOrderAsync(CreateOrder createOrder);
+        public Task CreateOrderAsync(CreateOrder createOrder);
+        public Task<ListOrder> GetAllOrdersAsync(int page,int size);
+        public Task RemoveOrderAsync(string orderId);
     }
 }

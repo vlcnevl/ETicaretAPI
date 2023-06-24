@@ -101,6 +101,7 @@ namespace ETicaretAPI.API.Controllers
         [Authorize(AuthenticationSchemes = "Admin")]
         public async Task<IActionResult> ChangeShowcaseImage([FromQuery]ChangeShowcaseImageCommandRequest request)
         {
+            //vitrin resmi
             ChangeShowcaseImageCommandResponse response = await _mediator.Send(request);
             return Ok();
         }
