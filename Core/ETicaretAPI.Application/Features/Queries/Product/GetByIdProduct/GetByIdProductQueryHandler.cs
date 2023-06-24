@@ -1,4 +1,6 @@
-﻿using ETicaretAPI.Application.Repositories.ProductRepositories;
+﻿using ETicaretAPI.Application.Abstraction.Services;
+using ETicaretAPI.Application.Repositories.ProductRepositories;
+using ETicaretAPI.Domain.Entities;
 using MediatR;
 using System;
 using System.Collections.Generic;
@@ -10,16 +12,17 @@ namespace ETicaretAPI.Application.Features.Queries.Product.GetByIdProduct
 {
     public class GetByIdProductQueryHandler : IRequestHandler<GetByIdProductQueryRequest, GetByIdProductQueryResponse>
     {
-        readonly IProductReadRepository _productReadRepository;
+        readonly IProductService _productService;
 
-        public GetByIdProductQueryHandler(IProductReadRepository productReadRepository)
+        public GetByIdProductQueryHandler(IProductService productService)
         {
-            _productReadRepository = productReadRepository;
+            _productService = productService;
         }
 
         public async Task<GetByIdProductQueryResponse> Handle(GetByIdProductQueryRequest request, CancellationToken cancellationToken)
         {
-          ETicaretAPI.Domain.Entities.Product product=  await _productReadRepository.GetByIdAsync(request.Id);
+            Domain.Entities.Product product = await _productService.GetByIdProduct(request.Id);
+          
             return  new() { 
                 Name = product.Name,
                 Description = product.Description,
