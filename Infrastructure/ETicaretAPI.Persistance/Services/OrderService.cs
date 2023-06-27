@@ -58,10 +58,31 @@ namespace ETicaretAPI.Persistance.Services
             };
 
         }
-      
 
+        public async Task<SingleOrder> GetByIdOrderAsync(string id)
+        {
 
+            //order tablosunun içindeki baskete gittik.sonra basketin içindeki basketitemslere .daha sonra basketitemsler içerisindeki productlara
+            var data = await _orderReadRepository.Table.Include(o => o.Basket)
+                .ThenInclude(b => b.BasketItems)
+                .ThenInclude(bi => bi.Product)
+                .FirstOrDefaultAsync(order => order.Id == Guid.Parse(id));
 
+            return new() {
+                Id = data.Id.ToString(),
+                BasketItems = data.Basket.BasketItems.Select(bi => new // kaç tane basket items varsa hepsini getirir.
+                {
+                    bi.Product.Name,
+                    bi.Product.Price,
+                    bi.Quantity,
+                }),
+                Address = data.Address ,
+                CreatedDate= data.CreatedDate,
+                OrderCode = data.OrderCode,
+                Description = data.Description,
+               
+            };
+        }
 
         public async Task RemoveOrderAsync(string orderId)
         {
