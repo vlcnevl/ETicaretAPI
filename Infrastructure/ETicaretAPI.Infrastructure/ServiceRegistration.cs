@@ -1,4 +1,5 @@
-﻿using ETicaretAPI.Application.Abstraction.Stroage;
+﻿using ETicaretAPI.Application.Abstraction.Services;
+using ETicaretAPI.Application.Abstraction.Stroage;
 using ETicaretAPI.Application.Abstraction.Stroage.LocalStroage;
 using ETicaretAPI.Application.Abstraction.Token;
 using ETicaretAPI.Infrastructure.Enums;
@@ -22,6 +23,7 @@ namespace ETicaretAPI.Infrastructure
         {
            services.AddScoped<IStroageService,StroageService>();
            services.AddScoped<ITokenHandler, TokenHandler>();
+           services.AddScoped<IMailService,MailService>();
         }
 
         public static void AddStroage<T>(this IServiceCollection services) where T : Stroage, IStroage
