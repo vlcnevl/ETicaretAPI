@@ -8,6 +8,7 @@ using ETicaretAPI.Domain.Entities.Identity;
 using Google.Apis.Auth;
 using MediatR;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using System;
@@ -26,13 +27,15 @@ namespace ETicaretAPI.Persistance.Services
         readonly SignInManager<Domain.Entities.Identity.AppUser> _signInManager;
         readonly IConfiguration _configuration;
         readonly IUserService _userService;
-        public AuthService(UserManager<AppUser> userManager, ITokenHandler tokenHandler, SignInManager<AppUser> signInManager, IConfiguration configuration, IUserService userService)
+        readonly IMailService _mailService;
+        public AuthService(UserManager<AppUser> userManager, ITokenHandler tokenHandler, SignInManager<AppUser> signInManager, IConfiguration configuration, IUserService userService, IMailService mailService)
         {
             _userManager = userManager;
             _tokenHandler = tokenHandler;
             _signInManager = signInManager;
             _configuration = configuration;
             _userService = userService;
+            _mailService = mailService;
         }
 
         public async Task<Token> GoogleLoginAsync(string idToken,int accessTokenLifeTime)
@@ -115,6 +118,22 @@ namespace ETicaretAPI.Persistance.Services
             }
             else
                 throw new UserNotFoundException();
+        }
+
+        public async Task ResetPasswordAsync(string email)
+        {
+            AppUser user = await _userManager.FindByEmailAsync(email);
+
+            if(user != null)
+            {
+                try
+                {
+                    var token = await _userManager.GeneratePasswordResetTokenAsync(user).ConfigureAwait(false);
+                
+                    await _mailService.SendPasswordResetMailAsync(email, user.Id, "deneme");
+                }
+                catch (Exception ex) { }
+            }
         }
     }
 }

@@ -21,6 +21,7 @@ using ETicaretAPI.Application.Repositories.BasketRepositories;
 using ETicaretAPI.Persistance.Repositories.BasketRepositories;
 using ETicaretAPI.Application.Repositories.BasketItemRepositories;
 using ETicaretAPI.Persistance.Repositories.BasketItemRepositories;
+using Microsoft.AspNetCore.Identity;
 
 namespace ETicaretAPI.Persistance
 {
@@ -38,8 +39,10 @@ namespace ETicaretAPI.Persistance
                 options.Password.RequireLowercase = false;
                 options.Password.RequireUppercase = false;
                 })
-                .AddEntityFrameworkStores<ETicaretAPIDbContext>();//identity mekanizması
-            
+                .AddEntityFrameworkStores<ETicaretAPIDbContext>().AddDefaultTokenProviders();//identity mekanizması
+            services.Configure<DataProtectionTokenProviderOptions>(options => options.TokenLifespan = TimeSpan.FromHours(10));
+
+            //token providers identityden reset password token ürettirmek için
             services.AddScoped<ICustomerReadRepository,CustomerReadRepository>();
             services.AddScoped<ICustomerWriteRepository,CustomerWriteRepository>();
             services.AddScoped<IProductReadRepository,ProductReadRepository>();
