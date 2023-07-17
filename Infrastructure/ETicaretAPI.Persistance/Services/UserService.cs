@@ -2,9 +2,11 @@
 using ETicaretAPI.Application.DTOs.User;
 using ETicaretAPI.Application.Exceptions;
 using ETicaretAPI.Application.Features.Commands.AppUser.CreateUser;
+using ETicaretAPI.Application.Helpers;
 using ETicaretAPI.Domain.Entities.Identity;
 using MediatR;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.WebUtilities;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -44,7 +46,7 @@ namespace ETicaretAPI.Persistance.Services
             return response;
         }
 
-        public async Task UpdateRefreshToken(string refreshToken, AppUser user, DateTime accessTokenTime,int refreshTokenLifeTime)
+        public async Task UpdateRefreshTokenAsync(string refreshToken, AppUser user, DateTime accessTokenTime,int refreshTokenLifeTime)
         {
             if (user!=null) 
             {
@@ -54,6 +56,26 @@ namespace ETicaretAPI.Persistance.Services
             }
             else
             throw new UserNotFoundException();
+        }
+
+
+        public async Task UpdatePasswordAsync(string userId, string newPassword, string resetToken)
+        {
+            AppUser user = await _userManager.FindByIdAsync(userId);
+            if (user != null)
+            {
+                resetToken.UrlDecode();
+                IdentityResult result = await _userManager.ResetPasswordAsync(user, resetToken, newPassword);
+           
+
+                if(result.Succeeded)
+                { //reset token security stamp ile doğrulandığı için parola güncellenince security stampda güncellendi.reset linki işlevsizleşti.
+                   await _userManager.UpdateSecurityStampAsync(user);
+                }
+                else throw new PasswordChangeFailedException();
+            
+            }
+
         }
     }
 }

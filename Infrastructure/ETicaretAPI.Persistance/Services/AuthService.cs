@@ -4,6 +4,7 @@ using ETicaretAPI.Application.DTOs;
 using ETicaretAPI.Application.DTOs.User;
 using ETicaretAPI.Application.Exceptions;
 using ETicaretAPI.Application.Features.Commands.AppUser.LoginUser;
+using ETicaretAPI.Application.Helpers;
 using ETicaretAPI.Domain.Entities.Identity;
 using Google.Apis.Auth;
 using MediatR;
@@ -75,7 +76,7 @@ namespace ETicaretAPI.Persistance.Services
             {
                 await _userManager.AddLoginAsync(user, info);// Asp.NetUserLogins tablosuna eklendi.
                 Application.DTOs.Token token = _tokenHandler.CreateAccessToken(accessTokenLifeTime,user);
-                await _userService.UpdateRefreshToken(token.RefreshToken, user, token.Expiration,600);
+                await _userService.UpdateRefreshTokenAsync(token.RefreshToken, user, token.Expiration,600);
 
                 return token;
             }
@@ -97,7 +98,7 @@ namespace ETicaretAPI.Persistance.Services
             if (result.Succeeded) //authantication basarili
             {
                 Token token = _tokenHandler.CreateAccessToken(accessTokenLifeTime, user);
-                await _userService.UpdateRefreshToken(token.RefreshToken, user, token.Expiration, 2400);//refresh tokeni olustur ve veritabanına kaydet.
+                await _userService.UpdateRefreshTokenAsync(token.RefreshToken, user, token.Expiration, 2400);//refresh tokeni olustur ve veritabanına kaydet.
 
                 return token; 
             }
@@ -113,7 +114,7 @@ namespace ETicaretAPI.Persistance.Services
             if (user != null && user?.RefreshTokenEndTime > DateTime.UtcNow)
             {
                 Token token = _tokenHandler.CreateAccessToken(15,user);
-                await _userService.UpdateRefreshToken(token.RefreshToken, user, token.Expiration, 2400);
+                await _userService.UpdateRefreshTokenAsync(token.RefreshToken, user, token.Expiration, 2400);
                 return token;
             }
             else
@@ -126,14 +127,27 @@ namespace ETicaretAPI.Persistance.Services
 
             if(user != null)
             {
-                try
-                {
-                    var token = await _userManager.GeneratePasswordResetTokenAsync(user).ConfigureAwait(false);
                 
-                    await _mailService.SendPasswordResetMailAsync(email, user.Id, "deneme");
-                }
-                catch (Exception ex) { }
+              var token = await _userManager.GeneratePasswordResetTokenAsync(user);
+              token = CustomEncoders.UrlEncode(token); //custom helpers yazdık 
+              await _mailService.SendPasswordResetMailAsync(email, user.Id, token);
+             
             }
+        }
+
+        public async Task<bool> VerifyResetPasswordToken(string userId, string resetToken)
+        {
+            AppUser user = await _userManager.FindByIdAsync(userId);
+
+            if (user != null)
+            {
+               resetToken =  CustomEncoders.UrlDecode(resetToken);
+
+                return await _userManager.VerifyUserTokenAsync(user, _userManager.Options.Tokens.PasswordResetTokenProvider, "ResetPassword", resetToken);
+
+            }
+
+            return false;
         }
     }
 }
