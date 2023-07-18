@@ -21,6 +21,7 @@ namespace ETicaretAPI.Persistance.Contexts
         public DbSet<InvoiceFile> InvoiceFiles { get; set; }  // 
         public DbSet<Basket> Baskets { get; set; }  
         public DbSet<BasketItem> BasketItems { get; set; }
+        public DbSet<CompletedOrder> CompletedOrders { get; set; }
 
 
         protected override void OnModelCreating(ModelBuilder builder) // order ve basket arasında 1-1 iliski oldugu için bunu bildirmemiz gerekli.
@@ -31,6 +32,13 @@ namespace ETicaretAPI.Persistance.Contexts
 
             builder.Entity<Basket>().HasOne(b => b.Order).WithOne(o => o.Basket).HasForeignKey<Order>(o => o.Id);
             //orderin içindeki id foreign key
+
+            builder.Entity<Order>().HasOne(o => o.CompletedOrder).WithOne(c => c.Order).HasForeignKey<CompletedOrder>(o => o.OrderId);
+            //complete order tablosubnda olan orderId order'in id si ile eşleşti.
+
+
+
+
             base.OnModelCreating(builder); //identityDbContext kullandığımız için override edemedik.basedekini çağırdık. 
         }
 

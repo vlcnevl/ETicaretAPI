@@ -1,7 +1,9 @@
 ﻿using ETicaretAPI.Application.Abstraction.Services;
 using ETicaretAPI.Application.DTOs.Order;
+using ETicaretAPI.Application.Repositories.CompleteOrderRepositories;
 using ETicaretAPI.Application.Repositories.OrderRepositories;
 using ETicaretAPI.Domain.Entities;
+using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -15,11 +17,13 @@ namespace ETicaretAPI.Persistance.Services
     {
         readonly IOrderWriteRepository _orderWriteRepository;
         readonly IOrderReadRepository _orderReadRepository;
+        readonly ICompleteOrderWriteRepository _completeOrderWriteRepository;
 
-        public OrderService(IOrderWriteRepository orderWriteRepository, IOrderReadRepository orderReadRepository)
+        public OrderService(IOrderWriteRepository orderWriteRepository, IOrderReadRepository orderReadRepository, ICompleteOrderWriteRepository completeOrderWriteRepository)
         {
             _orderWriteRepository = orderWriteRepository;
             _orderReadRepository = orderReadRepository;
+            _completeOrderWriteRepository = completeOrderWriteRepository;
         }
 
         public async Task CreateOrderAsync(CreateOrder createOrder)
@@ -94,5 +98,18 @@ namespace ETicaretAPI.Persistance.Services
             }
 
         }
+
+        public  async Task CompleteOrderAsync(string orderId)
+        {
+            Order order = await _orderReadRepository.GetByIdAsync(orderId);
+
+            if(order != null)
+            {
+               await _completeOrderWriteRepository.AddAsync(new() { OrderId = Guid.Parse(orderId)});
+               await _completeOrderWriteRepository.SaveAsync(); 
+            }
+
+        }
+
     }
 }

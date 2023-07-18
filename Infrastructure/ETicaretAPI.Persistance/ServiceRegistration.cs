@@ -7,7 +7,7 @@ using ETicaretAPI.Application.Repositories.ProductRepositories;
 using ETicaretAPI.Persistance.Repositories.ProductRepositories;
 using ETicaretAPI.Application.Repositories.OrderRepositories;
 using ETicaretAPI.Persistance.Repositories.OrderRepositories;
-using ETicaretAPI.Application.Repositories.File;
+using ETicaretAPI.Application.Repositories.FileRepositories ;
 using ETicaretAPI.Persistance.Repositories.FileRepositories;
 using ETicaretAPI.Application.Repositories.ProductIamgeFileRepositories;
 using ETicaretAPI.Persistance.Repositories.ProductImageFileRepositories;
@@ -22,6 +22,8 @@ using ETicaretAPI.Persistance.Repositories.BasketRepositories;
 using ETicaretAPI.Application.Repositories.BasketItemRepositories;
 using ETicaretAPI.Persistance.Repositories.BasketItemRepositories;
 using Microsoft.AspNetCore.Identity;
+using ETicaretAPI.Application.Repositories.CompleteOrderRepositories;
+using ETicaretAPI.Persistance.Repositories.CompleteOrderRepositories;
 
 namespace ETicaretAPI.Persistance
 {
@@ -59,7 +61,8 @@ namespace ETicaretAPI.Persistance
             services.AddScoped<IBasketWriteRepository, BasketWriteRepository>();
             services.AddScoped<IBasketItemReadRepository,BasketItemReadRepository>();
             services.AddScoped<IBasketItemWriteRepository,BasketItemWriteRepository>();
-
+            services.AddScoped<ICompleteOrderReadRepository,CompleteOrderReadRepository>();
+            services.AddScoped<ICompleteOrderWriteRepository,CompleteOrderWriteRepository>();
 
             services.AddScoped<IUserService, UserService>();
             services.AddScoped<IAuthService, AuthService>();    

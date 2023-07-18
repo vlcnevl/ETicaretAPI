@@ -64,7 +64,7 @@ namespace ETicaretAPI.Persistance.Services
             AppUser user = await _userManager.FindByIdAsync(userId);
             if (user != null)
             {
-                resetToken.UrlDecode();
+               resetToken = resetToken.UrlDecode();
                 IdentityResult result = await _userManager.ResetPasswordAsync(user, resetToken, newPassword);
            
 

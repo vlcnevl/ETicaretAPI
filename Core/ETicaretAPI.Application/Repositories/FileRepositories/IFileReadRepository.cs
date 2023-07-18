@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ETicaretAPI.Application.Repositories.File
+namespace ETicaretAPI.Application.Repositories.FileRepositories
 {
     public interface IFileReadRepository: IReadRepository<ETicaretAPI.Domain.Entities.File>
     {

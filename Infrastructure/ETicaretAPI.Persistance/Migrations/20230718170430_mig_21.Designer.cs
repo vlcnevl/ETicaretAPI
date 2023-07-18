@@ -3,6 +3,7 @@ using System;
 using ETicaretAPI.Persistance.Contexts;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace ETicaretAPI.Persistance.Migrations
 {
     [DbContext(typeof(ETicaretAPIDbContext))]
-    partial class ETicaretAPIDbContextModelSnapshot : ModelSnapshot
+    [Migration("20230718170430_mig_21")]
+    partial class mig_21
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -78,7 +81,6 @@ namespace ETicaretAPI.Persistance.Migrations
             modelBuilder.Entity("ETicaretAPI.Domain.Entities.CompletedOrder", b =>
                 {
                     b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
                     b.Property<DateTime>("CreatedDate")
@@ -91,9 +93,6 @@ namespace ETicaretAPI.Persistance.Migrations
                         .HasColumnType("timestamp with time zone");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("OrderId")
-                        .IsUnique();
 
                     b.ToTable("CompletedOrders");
                 });
@@ -487,7 +486,7 @@ namespace ETicaretAPI.Persistance.Migrations
                 {
                     b.HasOne("ETicaretAPI.Domain.Entities.Order", "Order")
                         .WithOne("CompletedOrder")
-                        .HasForeignKey("ETicaretAPI.Domain.Entities.CompletedOrder", "OrderId")
+                        .HasForeignKey("ETicaretAPI.Domain.Entities.CompletedOrder", "Id")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
