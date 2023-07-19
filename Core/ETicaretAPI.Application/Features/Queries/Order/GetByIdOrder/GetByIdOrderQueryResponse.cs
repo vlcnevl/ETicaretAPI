@@ -14,6 +14,7 @@ namespace ETicaretAPI.Application.Features.Queries.Order.GetByIdOrder
         public string Address { get; set; }
         public DateTime CreatedDate { get; set; }
         public object BasketItems { get; set; }
+        public bool Completed { get; set; }
 
     }
 }
