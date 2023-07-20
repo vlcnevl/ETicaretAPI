@@ -10,5 +10,6 @@ namespace ETicaretAPI.Application.Abstraction.Services
     {
         Task SendMailAsync(string to,string subject,string body,bool isBodyHtml=true);
         Task SendPasswordResetMailAsync(string to,string userId,string resetToken);
+        Task SendCompletedOrderMailAsync(string to,string NameSurname, string orderCode,DateTime orderDate);
     }
 }

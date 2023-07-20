@@ -23,7 +23,7 @@ namespace ETicaretAPI.Infrastructure
         {
            services.AddScoped<IStroageService,StroageService>();
            services.AddScoped<ITokenHandler, TokenHandler>();
-           services.AddScoped<IMailService,MailService>();
+          services.AddScoped<IMailService,MailService>();   
         }
 
         public static void AddStroage<T>(this IServiceCollection services) where T : Stroage, IStroage
