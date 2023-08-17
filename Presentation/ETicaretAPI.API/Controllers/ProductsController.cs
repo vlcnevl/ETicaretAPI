@@ -1,4 +1,7 @@
 ﻿using ETicaretAPI.Application.Abstraction.Stroage;
+using ETicaretAPI.Application.Consts;
+using ETicaretAPI.Application.CustomAttributes;
+using ETicaretAPI.Application.Enums;
 using ETicaretAPI.Application.Features.Commands.Product.CreateProduct;
 using ETicaretAPI.Application.Features.Commands.Product.RemoveProduct;
 using ETicaretAPI.Application.Features.Commands.Product.UpdateProduct;
@@ -48,6 +51,8 @@ namespace ETicaretAPI.API.Controllers
 
         [HttpPost]
         [Authorize(AuthenticationSchemes = "Admin")]
+        [AuthorizeDefinition(Menu = AuthorizeDefinitionConstants.Products, ActionType = ActionType.Writing, Definition = "Create product")]
+
         public async Task<IActionResult> Post(CreateProductCommandRequest request)
         {
             await _mediator.Send(request);
@@ -57,6 +62,7 @@ namespace ETicaretAPI.API.Controllers
 
         [HttpPut]
         [Authorize(AuthenticationSchemes = "Admin")]
+        [AuthorizeDefinition(Menu = AuthorizeDefinitionConstants.Products, ActionType = ActionType.Updating, Definition = "Update product")]
         public async Task<IActionResult> Put([FromBody] UpdateProductCommandRequest request)
         {
             UpdateProductCommandResponse response = await _mediator.Send(request);
@@ -66,6 +72,7 @@ namespace ETicaretAPI.API.Controllers
 
         [HttpDelete("{Id}")] // request model içerisindeki Id ile bind olabilmesi için
         [Authorize(AuthenticationSchemes = "Admin")]
+        [AuthorizeDefinition(Menu = AuthorizeDefinitionConstants.Products, ActionType = ActionType.Deleting, Definition = "Delete product")]
         public async Task<IActionResult> Delete([FromRoute] RemoveProductCommandRequest request)
         {
             RemoveProductCommandResponse response = await _mediator.Send(request);
@@ -74,6 +81,7 @@ namespace ETicaretAPI.API.Controllers
 
         [HttpPost("[action]")]
         [Authorize(AuthenticationSchemes = "Admin")]
+        [AuthorizeDefinition(Menu = AuthorizeDefinitionConstants.Products, ActionType = ActionType.Writing, Definition = "upload product file")]
         public async Task<IActionResult> Upload([FromQuery] UploadProductImageCommandRequest request) // hangi ürüne dosya yüklendiğini id'den ayırt edeceğiz.QueryString'ten geliyo
         {
             request.Files = Request.Form.Files;
@@ -82,6 +90,7 @@ namespace ETicaretAPI.API.Controllers
         }
 
         [HttpGet("[action]/{Id}")] //route'dan geliyor
+        [AuthorizeDefinition(Menu = AuthorizeDefinitionConstants.Products, ActionType = ActionType.Reading, Definition = "get product images")]
         public async Task<IActionResult> GetProductImages([FromRoute] GetProductImagesQueryRequest request)
         {
           List<GetProductImagesQueryResponse> response = await _mediator.Send(request);
@@ -90,6 +99,7 @@ namespace ETicaretAPI.API.Controllers
 
         [HttpDelete("[action]/{Id}")] // iki değer normal parametre olarak karşılanıp içerde instance a bind edilebilir.
         [Authorize(AuthenticationSchemes = "Admin")]
+        [AuthorizeDefinition(Menu = AuthorizeDefinitionConstants.Products, ActionType = ActionType.Deleting, Definition = "Delete product image")]
         public async Task<IActionResult> DeleteProductImage([FromRoute] RemoveProductImageCommandRequest request, [FromQuery] string imageId)
         {
             request.ImageId = imageId;
@@ -99,6 +109,7 @@ namespace ETicaretAPI.API.Controllers
 
         [HttpGet("[action]")]
         [Authorize(AuthenticationSchemes = "Admin")]
+        [AuthorizeDefinition(Menu = AuthorizeDefinitionConstants.Products, ActionType = ActionType.Updating, Definition = "Product showcase image upload ")]
         public async Task<IActionResult> ChangeShowcaseImage([FromQuery]ChangeShowcaseImageCommandRequest request)
         {
             //vitrin resmi
