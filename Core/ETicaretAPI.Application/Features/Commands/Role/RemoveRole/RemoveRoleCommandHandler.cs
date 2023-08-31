@@ -19,7 +19,7 @@ namespace ETicaretAPI.Application.Features.Commands.Role.RemoveRole
 
         public async Task<RemoveRoleCommandResponse> Handle(RemoveRoleCommandRequest request, CancellationToken cancellationToken)
         {
-            bool result = await _roleService.DeleteRole(request.RoleName);
+            bool result = await _roleService.DeleteRole(request.Id);
             return new() { Succeded = result };
         }
     }

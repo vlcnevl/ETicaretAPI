@@ -50,7 +50,7 @@ namespace ETicaretAPI.API.Controllers
             return Ok(response);
         }
 
-        [HttpDelete("{name}")]
+        [HttpDelete("{Id}")]
         [AuthorizeDefinition(ActionType = ActionType.Deleting, Definition = "Delete Role By Id", Menu = "Roles")]
 
         public async Task<IActionResult> DeleteRole([FromRoute]RemoveRoleCommandRequest request)

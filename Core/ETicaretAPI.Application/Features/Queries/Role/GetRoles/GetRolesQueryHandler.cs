@@ -19,8 +19,8 @@ namespace ETicaretAPI.Application.Features.Queries.Role.GetRoles
 
         public async Task<GetRolesQueryResponse> Handle(GetRolesQueryRequest request, CancellationToken cancellationToken)
         {
-            var roles = _roleService.GetAllRoles();
-            return new GetRolesQueryResponse() { Roles = roles };  
+            var (roles,totalCount) = _roleService.GetAllRoles(request.Page,request.Size);
+            return new GetRolesQueryResponse() { Roles = roles ,TotalCount = totalCount};  
         }
     }
 }

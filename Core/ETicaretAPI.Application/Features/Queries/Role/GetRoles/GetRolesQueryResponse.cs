@@ -8,6 +8,7 @@ namespace ETicaretAPI.Application.Features.Queries.Role.GetRoles
 {
     public class GetRolesQueryResponse
     {
-        public IDictionary<string,string> Roles { get; set; }
+        public object Roles { get; set; }
+        public int TotalCount { get; set; }
     }
 }
