@@ -22,8 +22,8 @@ namespace ETicaretAPI.Persistance.Contexts
         public DbSet<Basket> Baskets { get; set; }  
         public DbSet<BasketItem> BasketItems { get; set; }
         public DbSet<CompletedOrder> CompletedOrders { get; set; }
-
-
+        public DbSet<Menu> Menus { get; set; }
+        public DbSet<Endpoint> Endpoints { get; set; }
         protected override void OnModelCreating(ModelBuilder builder) // order ve basket arasında 1-1 iliski oldugu için bunu bildirmemiz gerekli.
         {
             builder.Entity<Order>().HasKey(o => o.Id); // orderdaki idyi primary key olarak ayarladık.
