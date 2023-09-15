@@ -1,4 +1,5 @@
 ﻿using ETicaretAPI.Application.Features.Commands.AuthorizationEndpoint.AssignRoleEndpoint;
+using ETicaretAPI.Application.Features.Queries.AuthorizationEndpoint.GetRolesToEndpoint;
 using MediatR;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -23,5 +24,13 @@ namespace ETicaretAPI.API.Controllers
             AssignRoleEndpointCommandResponse response = await _mediator.Send(request);
             return Ok(response);
         }
+
+        [HttpPost("[action]")]
+        public async Task<IActionResult> GetRolesToEndpoint (GetRolesToEndpointQueryRequest request)
+        {
+           GetRolesToEndpointQueryResponse response = await _mediator.Send(request);
+            return Ok(response);
+        }
+
     }
 }

@@ -12,6 +12,7 @@ using System.Collections.Immutable;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Xml.Linq;
 
 namespace ETicaretAPI.Persistance.Services;
 
@@ -38,17 +39,18 @@ public class AuthorizationEndpointService : IAuthorizationEndpointService
         Menu? _menu = await _menuReadRepository.GetSingleAsync(o => o.Name == menu);
         if (_menu == null)
         {
-         await _menuWriteRepository.AddAsync(new()
+            _menu = new()
             {
-                Id= Guid.NewGuid(),
+                Id = Guid.NewGuid(),
                 Name = menu,
-            });
+            };
+
+            await _menuWriteRepository.AddAsync(_menu);
+            await _menuWriteRepository.SaveAsync();
         }
 
-        await _menuWriteRepository.SaveAsync();
 
-
-        Endpoint? endpoint = await _endpointReadRepository.Table.Include(e=>e.Menu).FirstOrDefaultAsync(e=> e.Code == code && e.Menu.Name ==menu);
+        Endpoint? endpoint = await _endpointReadRepository.Table.Include(e=>e.Menu).Include(e=> e.Roles).FirstOrDefaultAsync(e=> e.Code == code && e.Menu.Name ==menu);
 
         if (endpoint == null)
         {
@@ -62,7 +64,7 @@ public class AuthorizationEndpointService : IAuthorizationEndpointService
                 ActionType = action.ActionType,
                 HttpType = action.HttpType,
                 Definition = action.Definition,
-
+                Menu = _menu,
             };
 
            await _endpointWriteRepository.AddAsync(endpoint);
@@ -71,12 +73,28 @@ public class AuthorizationEndpointService : IAuthorizationEndpointService
 
         }
 
+
+        foreach(var role in endpoint.Roles)
+        {
+            endpoint.Roles.Remove(role);
+        }
+
+
        var appRoles = await _roleManager.Roles.Where(r => roles.Contains(r.Name)).ToListAsync();
 
         foreach(var role in appRoles)
             endpoint.Roles.Add(role);
         
         await _endpointWriteRepository.SaveAsync();
+    }
+
+    public async Task<List<string>> GetRolesToEndpointAsync(string code,string menu)
+    {
+      Endpoint? endpoint = await  _endpointReadRepository.Table.Include(e => e.Roles).Include(e=>e.Menu).FirstOrDefaultAsync(e => e.Code == code && e.Menu.Name == menu);
+      if (endpoint != null)
+            return endpoint.Roles.Select(r=>r.Name).ToList();
+
+        return null;
     }
 }
 
