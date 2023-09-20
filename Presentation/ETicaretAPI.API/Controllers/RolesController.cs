@@ -59,10 +59,10 @@ namespace ETicaretAPI.API.Controllers
             return Ok(response);
         }
 
-        [HttpPut("{Id}")]
+        [HttpPut]
         [AuthorizeDefinition(ActionType = ActionType.Updating, Definition = "Update Role", Menu = "Roles")]
 
-        public async Task<IActionResult> UpdateRole([FromBody,FromRoute]UpdateRoleCommandRequest request)
+        public async Task<IActionResult> UpdateRole([FromBody]UpdateRoleCommandRequest request)
         {
             UpdateRoleCommandResponse response = await _mediator.Send(request);
             return Ok(response);

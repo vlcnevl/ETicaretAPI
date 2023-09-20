@@ -24,7 +24,7 @@ namespace ETicaretAPI.Application.Features.Queries.AuthorizationEndpoint.GetRole
 
             return new()
             {
-                Roles = datas,
+                Roles = datas
             };
         }
     }

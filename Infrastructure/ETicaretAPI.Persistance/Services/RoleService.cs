@@ -36,8 +36,8 @@ namespace ETicaretAPI.Persistance.Services
             var query = _roleManager.Roles;
 
             IQueryable<AppRole> resultQuery = null;
-            if(page!=-1 && size!=-1)
-                resultQuery.Skip(page*size).Take(size);
+            if (page != -1 && size != -1)
+                resultQuery = query.Skip(page * size).Take(size);
             else
                 resultQuery = query;
 
