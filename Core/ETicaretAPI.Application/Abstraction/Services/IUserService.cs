@@ -13,6 +13,9 @@ namespace ETicaretAPI.Application.Abstraction.Services
         Task<CreateUserResponse> CreateAsync(CreateUser model); // cqrs modelini dto ya çevirip gönderdik.gelecek olan dto yu da cqrs responsa döndürceğiz.
         Task UpdateRefreshTokenAsync(string refreshToken,AppUser user,DateTime accessTokenTime, int refreshTokenLifeTime);
         Task UpdatePasswordAsync(string userId, string newPassword, string resetToken);
+        Task<List<ListUser>> GetAllUsersAsync(int page,int size);
+        Task AssignRoleToUser(string userId, string[] roles);
+        Task<string[]> GetRolesToUser(string userId);
     
     }
 }
