@@ -16,7 +16,7 @@ namespace ETicaretAPI.Infrastructure.Services
 
             QRCodeData data = codeGenerator.CreateQrCode(text, QRCodeGenerator.ECCLevel.Q);
             PngByteQRCode qrCode = new(data);
-            byte[] byteGraphic=qrCode.GetGraphic(10, new byte[] { 84, 99, 71 }, new byte[] { 240, 240, 240 });
+            byte[] byteGraphic=qrCode.GetGraphic(10, new byte[] { 95, 158, 160 }, new byte[] { 240, 240, 240 });
             return byteGraphic;
         }
     }

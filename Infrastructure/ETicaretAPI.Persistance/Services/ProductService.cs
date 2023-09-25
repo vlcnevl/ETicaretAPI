@@ -4,6 +4,7 @@ using ETicaretAPI.Application.Repositories.ProductRepositories;
 using ETicaretAPI.Domain.Entities;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
+using System.Text.Json;
 
 namespace ETicaretAPI.Persistance.Services
 {
@@ -11,11 +12,13 @@ namespace ETicaretAPI.Persistance.Services
     {
         readonly IProductReadRepository _productReadRepository;
         readonly IProductWriteRepository _productWriteRepository;
+        readonly IQRCodeService _qrCodeService;
 
-        public ProductService(IProductReadRepository productReadRepository, IProductWriteRepository productWriteRepository)
+        public ProductService(IProductReadRepository productReadRepository, IProductWriteRepository productWriteRepository, IQRCodeService qrCodeService)
         {
             _productReadRepository = productReadRepository;
             _productWriteRepository = productWriteRepository;
+            _qrCodeService = qrCodeService;
         }
 
         public async Task CreateProductAsync(CreateProduct Product)
@@ -49,9 +52,6 @@ namespace ETicaretAPI.Persistance.Services
 
 
             return new() { Products = products, TotalCount = totalCount };
-
-
-
         }
 
         public async Task<Product> GetByIdProduct(string Id)
@@ -75,6 +75,36 @@ namespace ETicaretAPI.Persistance.Services
             updateProduct.Name = product.Name;
             updateProduct.Price = product.Price;
 
+            await _productWriteRepository.SaveAsync();
+        }
+
+        public async Task<byte[]> QRCodeToProduct(string productId)
+        {
+            Product product = await _productReadRepository.GetByIdAsync(productId);
+            if (product == null)
+                throw new Exception("Ürün bulunamadı");
+
+            var plainObject = new
+            {
+                product.Id,
+                product.Name,
+                product.Price,
+                product.Stock,
+                product.Description,
+                product.CreatedDate
+            };
+
+            string plainText = JsonSerializer.Serialize(plainObject);
+           return _qrCodeService.CreateQRCode(plainText);
+        }
+
+        public async Task UpdateStockToProductAsync(string productId, int stock)
+        {
+            Product product = await _productReadRepository.GetByIdAsync(productId);
+            if(product == null)
+               throw new Exception("Ürün bulunamadı");
+
+            product.Stock = stock;
             await _productWriteRepository.SaveAsync();
         }
     }

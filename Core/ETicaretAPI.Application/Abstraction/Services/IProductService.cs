@@ -16,5 +16,7 @@ namespace ETicaretAPI.Application.Abstraction.Services
         public Task UpdateProductAsync(UpdateProduct Product);
         public Task<ListProduct> GetAllProductsAsync(int page, int size);
         public Task<Product> GetByIdProduct(string Id);
+        public Task<byte[]> QRCodeToProduct(string productId);
+        public Task UpdateStockToProductAsync(string productId,int stock);
     }
 }

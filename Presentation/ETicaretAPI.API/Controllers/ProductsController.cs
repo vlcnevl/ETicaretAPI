@@ -1,10 +1,12 @@
-﻿using ETicaretAPI.Application.Abstraction.Stroage;
+﻿using ETicaretAPI.Application.Abstraction.Services;
+using ETicaretAPI.Application.Abstraction.Stroage;
 using ETicaretAPI.Application.Consts;
 using ETicaretAPI.Application.CustomAttributes;
 using ETicaretAPI.Application.Enums;
 using ETicaretAPI.Application.Features.Commands.Product.CreateProduct;
 using ETicaretAPI.Application.Features.Commands.Product.RemoveProduct;
 using ETicaretAPI.Application.Features.Commands.Product.UpdateProduct;
+using ETicaretAPI.Application.Features.Commands.Product.UpdateStockQrCode;
 using ETicaretAPI.Application.Features.Commands.ProductImageFile.ChangeShowcaseImage;
 using ETicaretAPI.Application.Features.Commands.ProductImageFile.RemoveProductImage;
 using ETicaretAPI.Application.Features.Commands.ProductImageFile.UploadProductImage;
@@ -28,10 +30,12 @@ namespace ETicaretAPI.API.Controllers
     public class ProductsController : ControllerBase
     {
         readonly IMediator _mediator;
+        readonly IProductService _productService;
 
-        public ProductsController(IProductWriteRepository productWriteRepository, IProductReadRepository productReadRepository, IStroageService stroageService, IProductImageFileWriteRepository productImageFileWriteRepository, IConfiguration configuration, IMediator mediator)
+        public ProductsController(IProductWriteRepository productWriteRepository, IProductReadRepository productReadRepository, IStroageService stroageService, IProductImageFileWriteRepository productImageFileWriteRepository, IConfiguration configuration, IMediator mediator, IProductService productService)
         {
             _mediator = mediator;
+            _productService = productService;
         }
 
         [HttpGet]
@@ -116,6 +120,22 @@ namespace ETicaretAPI.API.Controllers
             ChangeShowcaseImageCommandResponse response = await _mediator.Send(request);
             return Ok();
         }
+
+        [HttpGet("qrcode/{productId}")]
+        public async Task<IActionResult> CreateQrCode([FromRoute] string productId)
+        {
+            var code = await _productService.QRCodeToProduct(productId);
+            return File(code,"image/png");
+        }
+
+
+        [HttpPut("qrcode")]
+        public async Task<IActionResult> UpdateStockQrCode([FromBody] UpdateStockQrCodeCommandRequest request)
+        {
+            UpdateStockQrCodeCommandResponse response = await _mediator.Send(request);
+            return Ok(response);
+        }
+
 
 
     }
