@@ -1,5 +1,6 @@
 using ETicaretAPI.API.Configurations.ColumnWriters;
 using ETicaretAPI.API.Extenions;
+using ETicaretAPI.API.Filters;
 using ETicaretAPI.Application;
 using ETicaretAPI.Application.Validators.Products;
 using ETicaretAPI.Infrastructure;
@@ -30,7 +31,11 @@ builder.Services.AddStroage<AzureStroage>();
 
 builder.Services.AddCors(options => options.AddDefaultPolicy(policy=> policy.WithOrigins("http://localhost:4200", "https://localhost:4200").AllowAnyHeader().AllowAnyMethod().AllowCredentials() ));//CORS POLÝTÝKASI
 
-builder.Services.AddControllers(options=> options.Filters.Add<ValidationFilter>()).AddFluentValidation(configuration => configuration.RegisterValidatorsFromAssemblyContaining<CreateProductValidator>())
+builder.Services.AddControllers(options=> // filtreleri pipeline a ekledik.
+{
+    options.Filters.Add<ValidationFilter>();
+    options.Filters.Add<RolePermissionFilter>();   
+}).AddFluentValidation(configuration => configuration.RegisterValidatorsFromAssemblyContaining<CreateProductValidator>())
         .ConfigureApiBehaviorOptions(options=> options.SuppressModelStateInvalidFilter = true);
 // application katmanýnda bir yer belli etmek için verdiik oraya kaç tane validator eklersek eklenecek hepsi
 //ikinci options asp.net le gelen base validasyon filtrelerini kaldýrarak bizim validasyonlarý yazacak

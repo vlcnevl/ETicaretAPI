@@ -1,5 +1,6 @@
 ﻿using ETicaretAPI.Application.Abstraction.Services;
 using ETicaretAPI.Application.CustomAttributes;
+using ETicaretAPI.Application.Features.Commands.AppUser.AssignRoleToUser;
 using ETicaretAPI.Application.Features.Commands.AppUser.CreateUser;
 using ETicaretAPI.Application.Features.Commands.AppUser.GoogleLogin;
 using ETicaretAPI.Application.Features.Commands.AppUser.LoginUser;
@@ -48,7 +49,7 @@ namespace ETicaretAPI.API.Controllers
         }
 
 
-        [HttpGet("get-roles-to-user/{UserId}")]
+        [HttpGet("getuserroles/{UserId}")]
         [Authorize(AuthenticationSchemes = "Admin")]
         [AuthorizeDefinition(ActionType = Application.Enums.ActionType.Reading, Definition = "Get roles to user", Menu = "Users")]
         public async Task<IActionResult> GetRolesToUser([FromRoute] GetRolesToUserQueryRequest request)
@@ -57,12 +58,12 @@ namespace ETicaretAPI.API.Controllers
             return Ok(response);
         }
 
-        [HttpPost("assign-role-to-user")]
+        [HttpPost("assignroles")]
         [Authorize(AuthenticationSchemes = "Admin")]
         [AuthorizeDefinition(ActionType = Application.Enums.ActionType.Writing, Definition = "Assign role to user", Menu = "Users")]
-        public async Task<IActionResult> AssignRoleToUser(AssignRoleEndpointCommandRequest request)
+        public async Task<IActionResult> AssignRoleToUser([FromBody]AssignRoleToUserCommandRequest request)
         {
-            AssignRoleEndpointCommandResponse response = await _mediator.Send(request);
+            AssignRoleToUserCommandResponse response = await _mediator.Send(request);
             return Ok(response);
         }
 

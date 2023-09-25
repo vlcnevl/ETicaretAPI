@@ -19,7 +19,7 @@ namespace ETicaretAPI.Application.Features.Commands.AppUser.AssignRoleToUser
 
         public async Task<AssignRoleToUserCommandResponse> Handle(AssignRoleToUserCommandRequest request, CancellationToken cancellationToken)
         {
-           await _userService.AssignRoleToUser(request.UserId, request.Roles);
+           await _userService.AssignRoleToUserAsync(request.UserId, request.Roles);
             return new();
         }
     }

@@ -3,6 +3,8 @@ using ETicaretAPI.Application.DTOs.User;
 using ETicaretAPI.Application.Exceptions;
 using ETicaretAPI.Application.Features.Commands.AppUser.CreateUser;
 using ETicaretAPI.Application.Helpers;
+using ETicaretAPI.Application.Repositories.EndpointRepositories;
+using ETicaretAPI.Domain.Entities;
 using ETicaretAPI.Domain.Entities.Identity;
 using MediatR;
 using Microsoft.AspNetCore.Identity;
@@ -20,10 +22,11 @@ namespace ETicaretAPI.Persistance.Services
     public class UserService : IUserService
     {
         readonly UserManager<Domain.Entities.Identity.AppUser> _userManager;
-
-        public UserService(UserManager<AppUser> userManager)
+        readonly IEndpointReadRepository _endpointReadRepository;
+        public UserService(UserManager<AppUser> userManager, IEndpointReadRepository endpointReadRepository)
         {
             _userManager = userManager;
+            _endpointReadRepository = endpointReadRepository;
         }
 
         public async Task<CreateUserResponse> CreateAsync(CreateUser model)
@@ -93,7 +96,7 @@ namespace ETicaretAPI.Persistance.Services
 
         }
 
-        public async Task AssignRoleToUser(string userId, string[] roles)
+        public async Task AssignRoleToUserAsync(string userId, string[] roles)
         {
             AppUser user =await _userManager.FindByIdAsync(userId);
             if(user != null)
@@ -101,17 +104,19 @@ namespace ETicaretAPI.Persistance.Services
               var _roles = await _userManager.GetRolesAsync(user);
                await _userManager.RemoveFromRolesAsync(user, _roles);
 
-               await _userManager.AddToRolesAsync(user, _roles);
+               await _userManager.AddToRolesAsync(user, roles);
             }
-
-
 
         }
 
-        public async Task<string[]> GetRolesToUser(string userId)
+        public async Task<string[]> GetRolesToUserAsync(string userIdOrName)
         {
-           AppUser user = await _userManager.FindByIdAsync(userId);
+           AppUser user = await _userManager.FindByIdAsync(userIdOrName);
 
+            if(user == null) 
+            {
+                user = await _userManager.FindByNameAsync(userIdOrName);
+            }
 
             if(user != null)
             {
@@ -121,6 +126,28 @@ namespace ETicaretAPI.Persistance.Services
             }
             
             throw new Exception("Kullanıcı bulunamadı");// özel bir hatada fırlatılabilir.
+        }
+
+        public async Task<bool> HasRolePermissionToEndpointAsync(string name, string endpointCode)
+        {
+            //endpointlere atanmıs roller ile kullanıcıya atanmıs rolleri karsılastırıyoruz.
+            var userRoles = await GetRolesToUserAsync(name);
+
+            if (!userRoles.Any()) 
+                return false;
+
+             Endpoint? endpoint = await _endpointReadRepository.Table.Include(e => e.Roles).FirstOrDefaultAsync(e=> e.Code == endpointCode);
+
+            if (endpoint == null)
+                return false;
+
+            var hasRole = false;
+
+            var endpointRoles = endpoint.Roles.Select(e => e.Name).ToArray();
+
+            hasRole = endpointRoles.Intersect(userRoles).Count()>0 ? true : false ;
+
+            return hasRole;
         }
     }
 }
